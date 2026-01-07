@@ -227,7 +227,7 @@ const Dates: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 pb-24 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500">
       
       {/* 1. CARTÃO DE DESTAQUE: PRÓXIMO ENCONTRO */}
       <section className="space-y-4">

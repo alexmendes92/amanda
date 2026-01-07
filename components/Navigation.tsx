@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Activity, Heart, Sparkles, LayoutGrid } from 'lucide-react';
+import { Home, Activity, Heart, Sparkles } from 'lucide-react';
 import { AppTab } from '../types';
 
 interface NavigationProps {
@@ -10,7 +10,7 @@ interface NavigationProps {
 
 const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
   
-  // Lógica para identificar qual "Hub" está ativo, mesmo se estiver em uma sub-ferramenta
+  // Lógica para identificar qual "Hub" está ativo
   const isRoutineActive = [
     AppTab.ROUTINE_MENU, 
     AppTab.FITNESS, 
@@ -42,74 +42,69 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
       label: 'Início',
       icon: Home,
       isActive: isHomeActive,
-      activeColor: 'bg-blue-500',
-      textColor: 'text-blue-500'
+      activeClass: 'bg-blue-100 text-blue-600',
+      iconColor: 'text-blue-600'
     },
     {
       id: AppTab.ROUTINE_MENU,
       label: 'Rotina',
       icon: Activity,
       isActive: isRoutineActive,
-      activeColor: 'bg-emerald-500',
-      textColor: 'text-emerald-500'
+      activeClass: 'bg-emerald-100 text-emerald-600',
+      iconColor: 'text-emerald-600'
     },
     {
       id: AppTab.LOVE_MENU,
       label: 'Nós',
       icon: Heart,
       isActive: isLoveActive,
-      activeColor: 'bg-rose-500',
-      textColor: 'text-rose-500'
+      activeClass: 'bg-rose-100 text-rose-600',
+      iconColor: 'text-rose-600'
     },
     {
       id: AppTab.LEISURE_MENU,
       label: 'Lazer',
       icon: Sparkles,
       isActive: isLeisureActive,
-      activeColor: 'bg-amber-500',
-      textColor: 'text-amber-500'
+      activeClass: 'bg-amber-100 text-amber-600',
+      iconColor: 'text-amber-600'
     }
   ];
 
   return (
-    <div className="fixed bottom-6 left-0 right-0 flex justify-center z-50 pointer-events-none">
-      <nav className="bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-full p-2 shadow-2xl pointer-events-auto flex items-center gap-1 mx-4 max-w-sm w-full justify-between sm:justify-center sm:gap-4 transition-all duration-300 animate-in slide-in-from-bottom-10">
-        
+    <div className="fixed bottom-0 left-0 right-0 z-[100] bg-white/90 backdrop-blur-xl border-t border-slate-200/60 pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.03)]">
+      <nav className="flex items-center justify-around px-2 pt-2 pb-1 h-[70px]">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
-              className={`relative group flex flex-col items-center justify-center w-14 h-14 rounded-full transition-all duration-300 ${
-                item.isActive 
-                  ? 'bg-white/10 shadow-inner' 
-                  : 'hover:bg-white/5'
-              }`}
+              className={`relative flex flex-col items-center justify-center w-full h-full transition-all duration-300 active:scale-95 group`}
             >
-              {/* Active Indicator Dot */}
-              {item.isActive && (
-                <span className={`absolute top-2 w-1 h-1 rounded-full ${item.activeColor} shadow-[0_0_8px_currentColor]`} />
-              )}
-
-              <div className={`transition-transform duration-300 ${item.isActive ? 'scale-110 -translate-y-0.5' : 'scale-100 group-hover:scale-105 group-active:scale-95'}`}>
+              <div 
+                className={`flex items-center justify-center p-1.5 px-5 rounded-full transition-all duration-300 ${
+                  item.isActive 
+                    ? item.activeClass 
+                    : 'bg-transparent text-slate-400 group-hover:bg-slate-50'
+                }`}
+              >
                 <Icon 
-                  className={`w-6 h-6 transition-colors duration-300 ${
-                    item.isActive 
-                      ? item.textColor 
-                      : 'text-slate-400 group-hover:text-slate-200'
-                  }`} 
-                  // Preencher ícone se ativo (exceto Activity/Sparkles que ficam melhor outline ou com stroke específico)
+                  className={`w-6 h-6 transition-transform duration-300 ${item.isActive ? 'scale-110' : ''}`} 
                   fill={item.isActive && item.id !== AppTab.ROUTINE_MENU && item.id !== AppTab.LEISURE_MENU ? "currentColor" : "none"}
+                  strokeWidth={item.isActive ? 2.5 : 2}
                 />
               </div>
               
-              {/* Label (Opcional, visível apenas se houver espaço ou preferência por icons only) */}
-              {item.isActive && (
-                <span className="text-[9px] font-bold text-white/90 absolute bottom-2 opacity-0 animate-in fade-in zoom-in duration-300" style={{ opacity: 1 }}>
-                  {item.label}
-                </span>
-              )}
+              <span 
+                className={`text-[10px] font-bold mt-1 transition-all duration-300 ${
+                  item.isActive 
+                    ? 'text-slate-800 translate-y-0 opacity-100' 
+                    : 'text-slate-400 translate-y-1 opacity-0 hidden'
+                }`}
+              >
+                {item.label}
+              </span>
             </button>
           );
         })}

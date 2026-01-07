@@ -74,7 +74,7 @@ const Supplements: React.FC = () => {
   const progress = Math.round((supplements.filter(s => s.taken).length / supplements.length) * 100);
 
   return (
-    <div className="space-y-6 pb-24 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500">
       
       {/* Header com Progresso */}
       <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 sticky top-0 z-10">

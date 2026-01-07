@@ -124,7 +124,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
   // 1. AMANDA'S VIEW (Musa Fitness)
   if (currentUser === 'amanda') {
     return (
-      <div className="space-y-8 pb-24">
+      <div className="space-y-8">
         {/* Header */}
         <div className="bg-rose-50 p-6 rounded-2xl border border-rose-100 text-center relative">
            <div className="absolute top-0 left-0 h-1 bg-rose-200 w-full rounded-t-2xl overflow-hidden">
@@ -197,11 +197,11 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
         </div>
 
         {/* Action Button */}
-        <div className="fixed bottom-24 left-6 right-6 z-30">
+        <div className="pt-4">
           {reportStatus === 'sent' ? (
              <div className="bg-green-600 text-white p-4 rounded-2xl shadow-xl flex items-center justify-center gap-2"><Check /> Relatório Enviado!</div>
           ) : (
-            <button onClick={handleSendReport} className="w-full bg-slate-900 text-white p-4 rounded-2xl shadow-xl flex items-center justify-between">
+            <button onClick={handleSendReport} className="w-full bg-slate-900 text-white p-4 rounded-2xl shadow-xl flex items-center justify-between hover:bg-slate-800 transition-colors">
               <div><p className="text-xs text-slate-400">Finalizar Dia</p><p className="font-bold">Prestar Contas 📝</p></div>
               <Send className="w-6 h-6 text-rose-300" />
             </button>
@@ -213,7 +213,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
 
   // 2. ALEX'S VIEW (Projeto Shape)
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-6">
       
       {/* Alex Header */}
       <div className="bg-slate-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">

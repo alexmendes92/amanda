@@ -53,7 +53,7 @@ const YouAreRight: React.FC<YouAreRightProps> = ({ currentUser }) => {
   };
 
   return (
-    <div className="h-full flex flex-col items-center justify-between pb-20 animate-in fade-in duration-500 relative overflow-hidden">
+    <div className="h-full flex flex-col items-center justify-between animate-in fade-in duration-500 relative overflow-hidden">
       
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-50">

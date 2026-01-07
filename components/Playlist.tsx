@@ -37,7 +37,7 @@ const Playlist: React.FC<PlaylistProps> = ({ currentUser }) => {
   };
 
   return (
-    <div className="space-y-6 pb-24 animate-in fade-in slide-in-from-right duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
       
       {/* Header Visual */}
       <div className="bg-slate-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">

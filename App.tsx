@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { UserRole, AppTab } from './types';
-import Navigation from './components/Navigation'; // Importação adicionada
+import Navigation from './components/Navigation';
 import SleepMonitor from './components/SleepMonitor';
 import Devotional from './components/Devotional';
 import Gallery from './components/Gallery';
@@ -21,6 +21,14 @@ import { UserCircle2, ListTodo, Dumbbell, Moon, Pill, CalendarHeart, Music, Imag
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserRole>('amanda');
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.HOME);
+  const mainViewportRef = useRef<HTMLElement>(null);
+
+  // Auto-scroll para o topo ao mudar de aba ou usuário
+  useEffect(() => {
+    if (mainViewportRef.current) {
+      mainViewportRef.current.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }, [activeTab, currentUser]);
 
   // Lógica de Navegação (Stack System)
   const getParentTab = (): AppTab => {
@@ -36,6 +44,21 @@ const App: React.FC = () => {
   };
 
   const showBackButton = activeTab !== AppTab.HOME;
+
+  // Definição de Tema Baseado no Usuário
+  const theme = currentUser === 'amanda' 
+    ? {
+        appBg: 'bg-rose-50',
+        accentColor: 'text-rose-600',
+        buttonBg: 'bg-rose-100',
+        iconColor: 'text-rose-600'
+      }
+    : {
+        appBg: 'bg-slate-100',
+        accentColor: 'text-blue-600',
+        buttonBg: 'bg-blue-100',
+        iconColor: 'text-blue-600'
+      };
 
   // Componente de Widget Reutilizável com UX Aprimorada
   const MenuWidget = ({ 
@@ -73,7 +96,7 @@ const App: React.FC = () => {
   );
 
   return (
-    <div className="h-full bg-slate-50 flex justify-center w-full">
+    <div className={`h-full flex justify-center w-full transition-colors duration-700 ease-in-out ${theme.appBg}`}>
       <div className="w-full max-w-md bg-white h-full relative shadow-2xl flex flex-col overflow-hidden">
         
         {/* Header / Profile Switcher - Glassmorphism Style */}
@@ -97,10 +120,10 @@ const App: React.FC = () => {
              
              <button 
                onClick={() => setCurrentUser(prev => prev === 'alex' ? 'amanda' : 'alex')}
-               className="flex items-center gap-2 bg-slate-100/80 py-1.5 pl-2 pr-3 rounded-full hover:bg-slate-200 transition-all active:scale-95 border border-slate-200/50"
+               className={`flex items-center gap-2 py-1.5 pl-2 pr-3 rounded-full hover:opacity-80 transition-all active:scale-95 border border-slate-200/50 ${theme.buttonBg} bg-opacity-50`}
              >
-               <div className={`p-1 rounded-full ${currentUser === 'amanda' ? 'bg-pink-100' : 'bg-blue-100'}`}>
-                 <UserCircle2 className={`w-4 h-4 ${currentUser === 'amanda' ? 'text-pink-600' : 'text-blue-600'}`} />
+               <div className={`p-1 rounded-full bg-white`}>
+                 <UserCircle2 className={`w-4 h-4 ${theme.iconColor}`} />
                </div>
                <span className="text-xs font-bold text-slate-700">
                  {currentUser === 'alex' ? 'Alex' : 'Amanda'}
@@ -110,13 +133,18 @@ const App: React.FC = () => {
         </div>
 
         {/* Main Content Area - Native Scroll Feeling */}
-        <main className="flex-1 px-6 pt-6 pb-safe overflow-y-auto no-scrollbar scroll-smooth">
+        {/* KEY PROP is crucial here: it forces React to re-mount and trigger animation when currentUser changes */}
+        <main 
+          key={currentUser}
+          ref={mainViewportRef}
+          className="flex-1 px-6 pt-6 pb-safe overflow-y-auto no-scrollbar scroll-smooth relative animate-in fade-in slide-in-from-bottom-4 duration-500"
+        >
           
-          <div className="pb-32"> {/* Aumentado padding bottom para acomodar o Dock Flutuante */}
+          <div className="pb-24"> {/* Espaço ajustado para a Tab Bar Fixa sem excessos */}
             
             {/* --- HOME DASHBOARD --- */}
             {activeTab === AppTab.HOME && (
-              <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
+              <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500 delay-100">
                 
                 {/* 1. Destaque */}
                 <Countdown currentUser={currentUser} />
@@ -164,12 +192,12 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Mensagem de Bom dia */}
-                <div className="p-6 bg-slate-900 rounded-[2rem] text-white shadow-xl shadow-slate-200 relative overflow-hidden">
-                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                <div className={`p-6 rounded-[2rem] text-white shadow-xl shadow-slate-200 relative overflow-hidden transition-colors duration-500 ${currentUser === 'amanda' ? 'bg-gradient-to-br from-rose-500 to-pink-600' : 'bg-slate-900'}`}>
+                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
                    <p className="font-bold text-lg mb-1 relative z-10">
                      {currentUser === 'amanda' ? 'Bom dia, Princesa! 👑' : 'Fala, Guerreiro! 🛡️'}
                    </p>
-                   <p className="text-slate-400 text-sm relative z-10">
+                   <p className="text-white/80 text-sm relative z-10">
                      {currentUser === 'amanda' 
                        ? 'Lembre-se: O Alex te ama mais que ontem.' 
                        : 'Hoje é um ótimo dia para fazer a Amanda sorrir.'}
@@ -315,25 +343,22 @@ const App: React.FC = () => {
             )}
 
             {/* --- CONTENT RENDERERS --- */}
-            {/* Usando key para forçar remontagem da animação quando a tab muda */}
-            <div key={activeTab} className="h-full">
-                {activeTab === AppTab.SLEEP && <SleepMonitor currentUser={currentUser} />}
-                {activeTab === AppTab.FITNESS && <FitnessTracker currentUser={currentUser} />}
-                {activeTab === AppTab.SUPPLEMENTS && <Supplements />}
-                {activeTab === AppTab.HABITS && <Habits />}
-                {activeTab === AppTab.INSIGHTS && <Insights currentUser={currentUser} />}
-                {activeTab === AppTab.PLAYLIST && <Playlist currentUser={currentUser} />}
-                {activeTab === AppTab.DATES && <Dates />}
-                {activeTab === AppTab.DEVOTIONAL && <Devotional currentUser={currentUser} />}
-                {activeTab === AppTab.FANDOM && <Fandom currentUser={currentUser} />}
-                {activeTab === AppTab.GALLERY && <Gallery currentUser={currentUser} />}
-                {activeTab === AppTab.YOU_ARE_RIGHT && <YouAreRight currentUser={currentUser} />}
-            </div>
+            {activeTab === AppTab.SLEEP && <SleepMonitor currentUser={currentUser} />}
+            {activeTab === AppTab.FITNESS && <FitnessTracker currentUser={currentUser} />}
+            {activeTab === AppTab.SUPPLEMENTS && <Supplements />}
+            {activeTab === AppTab.HABITS && <Habits />}
+            {activeTab === AppTab.INSIGHTS && <Insights currentUser={currentUser} />}
+            {activeTab === AppTab.PLAYLIST && <Playlist currentUser={currentUser} />}
+            {activeTab === AppTab.DATES && <Dates />}
+            {activeTab === AppTab.DEVOTIONAL && <Devotional currentUser={currentUser} />}
+            {activeTab === AppTab.FANDOM && <Fandom currentUser={currentUser} />}
+            {activeTab === AppTab.GALLERY && <Gallery currentUser={currentUser} />}
+            {activeTab === AppTab.YOU_ARE_RIGHT && <YouAreRight currentUser={currentUser} />}
             
           </div>
         </main>
         
-        {/* Navigation Dock */}
+        {/* Navigation Bar (Fixed at Bottom) */}
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
     </div>

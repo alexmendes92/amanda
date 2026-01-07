@@ -135,7 +135,7 @@ const Fandom: React.FC<FandomProps> = ({ currentUser }) => {
   // --- HARRY POTTER THEME (ALEX) ---
   if (currentUser === 'alex') {
     return (
-      <div className="min-h-full bg-slate-900 text-amber-50 p-6 space-y-6 pb-24 relative overflow-hidden">
+      <div className="min-h-full bg-slate-900 text-amber-50 p-6 space-y-6 relative overflow-hidden">
         {/* Background Stars */}
         <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
            <div className="absolute top-10 left-10 w-1 h-1 bg-white rounded-full animate-pulse"></div>
@@ -250,7 +250,7 @@ const Fandom: React.FC<FandomProps> = ({ currentUser }) => {
 
   // --- TWILIGHT THEME (AMANDA) ---
   return (
-    <div className="min-h-full bg-slate-800 text-slate-100 p-6 space-y-6 pb-24 relative overflow-hidden">
+    <div className="min-h-full bg-slate-800 text-slate-100 p-6 space-y-6 relative overflow-hidden">
       {/* Background Atmosphere */}
       <div className="absolute inset-0 bg-gradient-to-b from-slate-900 to-emerald-950 opacity-90 pointer-events-none"></div>
       <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"></div>

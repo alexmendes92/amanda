@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Heart, Lock, Plus } from 'lucide-react';
 import { PhotoPost, UserRole } from '../types';
@@ -42,7 +43,7 @@ const Gallery: React.FC<GalleryProps> = ({ currentUser }) => {
   };
 
   return (
-    <div className="h-full flex flex-col pb-20">
+    <div className="h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">

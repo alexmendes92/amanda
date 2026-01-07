@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Heart, CheckCircle2, Plus } from 'lucide-react';
 import { PrayerRequest, StudyStatus, UserRole } from '../types';
@@ -80,7 +81,7 @@ const Devotional: React.FC<DevotionalProps> = ({ currentUser }) => {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar pb-20">
+      <div className="flex-1 overflow-y-auto no-scrollbar">
         {activeTab === 'verse' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
             {loadingDaily ? (

@@ -361,7 +361,7 @@ const Habits: React.FC = () => {
     const theme = getThemeStyles(habit.colorTheme);
 
     return (
-      <div className="bg-slate-50 min-h-full pb-24 animate-in fade-in slide-in-from-right">
+      <div className="bg-slate-50 min-h-full animate-in fade-in slide-in-from-right">
         {/* Header */}
         <div className="bg-white px-4 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
           <button onClick={() => { setSelectedHabitId(null); setDetailTab('stats'); }} className="p-2 hover:bg-slate-100 rounded-full">
@@ -603,7 +603,7 @@ const Habits: React.FC = () => {
 
   // 2. MAIN VIEW (Tabs: Habits | Lists | Challenges)
   return (
-    <div className="space-y-6 pb-24 animate-in fade-in slide-in-from-right duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right duration-500">
       
       {/* Header Tabs Switcher */}
       <div className="px-6 pt-4">

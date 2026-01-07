@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CloudLightning, Sun, Heart, Zap, Coffee, Frown, AlertTriangle } from 'lucide-react';
 import { UserRole } from '../types';
@@ -125,7 +124,7 @@ const MoodWidget: React.FC<MoodWidgetProps> = ({ currentUser }) => {
            <div className="flex items-center gap-4 mt-1">
              <div className={`p-4 rounded-full bg-white shadow-sm border border-slate-100 ${partnerCurrentMood?.color}`}>
                 {/* Ícone grande */}
-                {React.cloneElement(partnerCurrentMood?.icon as React.ReactElement, { className: "w-8 h-8" })}
+                {partnerCurrentMood?.icon && React.cloneElement(partnerCurrentMood.icon as React.ReactElement<{ className?: string }>, { className: "w-8 h-8" })}
              </div>
              
              <div>
