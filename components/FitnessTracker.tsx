@@ -179,20 +179,57 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
            <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
              <Utensils className="w-5 h-5 text-green-500" /> Alimentação
            </h3>
-           <div className="grid grid-cols-2 gap-3 mb-6">
+           <div className="grid grid-cols-2 gap-3 mb-8">
              {Object.entries(meals).map(([key, val]) => (
-               <button key={key} onClick={() => toggleMeal(key as any)} className={`p-3 rounded-xl border text-sm font-medium ${val ? 'bg-green-50 border-green-200 text-green-700' : 'bg-white text-slate-400'}`}>
+               <button key={key} onClick={() => toggleMeal(key as any)} className={`p-3 rounded-xl border text-sm font-medium transition-all ${val ? 'bg-green-50 border-green-200 text-green-700' : 'bg-white text-slate-400 hover:bg-slate-50'}`}>
                  {key.charAt(0).toUpperCase() + key.slice(1)} {val && '✅'}
                </button>
              ))}
            </div>
            
-           <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-             <Droplets className="w-5 h-5 text-blue-500" /> Hidratação ({waterCount})
-           </h3>
-           <div className="flex gap-2 justify-center">
-              <button onClick={() => setWaterCount(Math.max(0, waterCount - 1))} className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center"><Minus className="w-4 h-4" /></button>
-              <button onClick={() => setWaterCount(Math.min(8, waterCount + 1))} className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg"><Plus className="w-4 h-4" /></button>
+           {/* REDESIGNED HYDRATION WIDGET */}
+           <div className="bg-blue-50/50 rounded-2xl p-5 border border-blue-100">
+             <div className="flex justify-between items-center mb-4">
+               <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                 <Droplets className="w-5 h-5 text-blue-500" /> Hidratação
+               </h3>
+               <span className="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded-md">{waterCount}/8</span>
+             </div>
+             
+             {/* Visual Progress Bar (Cups) */}
+             <div className="flex justify-between gap-1.5 mb-5 px-1">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div 
+                    key={i} 
+                    className={`h-8 w-full rounded-md transition-all duration-300 ${
+                      i < waterCount 
+                        ? 'bg-blue-400 scale-105 shadow-sm shadow-blue-200' 
+                        : 'bg-blue-100/50'
+                    }`}
+                  ></div>
+                ))}
+             </div>
+
+             <div className="flex items-center justify-between gap-4">
+                <button 
+                  onClick={() => setWaterCount(Math.max(0, waterCount - 1))} 
+                  className="w-12 h-12 bg-white text-blue-300 rounded-xl border border-blue-100 flex items-center justify-center hover:bg-blue-50 active:scale-95 transition-all shadow-sm"
+                >
+                  <Minus className="w-5 h-5" />
+                </button>
+                
+                <div className="flex-1 text-center">
+                   <p className="text-3xl font-black text-blue-500 tracking-tight">{waterCount * 250}</p>
+                   <p className="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Mililitros</p>
+                </div>
+
+                <button 
+                  onClick={() => setWaterCount(Math.min(8, waterCount + 1))} 
+                  className="w-12 h-12 bg-blue-500 text-white rounded-xl shadow-lg shadow-blue-200 flex items-center justify-center hover:bg-blue-600 active:scale-95 transition-all"
+                >
+                  <Plus className="w-6 h-6" />
+                </button>
+             </div>
            </div>
         </div>
 
