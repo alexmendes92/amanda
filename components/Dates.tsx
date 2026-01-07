@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, Clock, Heart, CheckCircle2, Plus, CalendarHeart, Navigation, Car, Building2, ArrowRight, Wand2, Sparkles, Cloud, Sun, Moon, Armchair, PartyPopper, Utensils } from 'lucide-react';
 import { Loader } from "@googlemaps/js-api-loader";
@@ -19,8 +20,7 @@ interface DateEvent {
 }
 
 const Dates: React.FC = () => {
-  // Dados simulados (depois virão do banco de dados)
-  // Define next date for the countdown
+  // Define next date for the countdown (Ilhabela - based on history context)
   const nextDate = new Date('2026-01-10T10:00:00');
   
   // Coordinates
@@ -43,31 +43,127 @@ const Dates: React.FC = () => {
     { id: 3, text: 'Cinema Drive-in', done: true },
   ]);
 
+  // Histórico baseado nas conversas
   const timeline: DateEvent[] = [
     {
-      id: 1,
-      title: 'Viagem para Ilhabela',
-      date: '30 Dez 2025',
-      location: 'Ilha Beach Hotel',
+      id: 14,
+      title: 'Uma Chance para o Amor',
+      date: '22 Dez',
+      location: 'São Paulo',
       type: 'past',
-      photo: 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?q=80&w=2070&auto=format&fit=crop', // Exemplo
-      notes: 'Onde quase perdemos o ônibus, mas foi perfeito.'
+      notes: 'Plantão + Paulista + Sushi + Baccio + Parque com conversas difíceis + "Jugo igual" + Alex ama Amanda 🥰 + Música ao vivo + "Não quero te deixar ir..."'
+    },
+    {
+      id: 13,
+      title: 'Picolé Misterioso',
+      date: '09 Dez',
+      location: 'São Paulo/Indaiá',
+      type: 'past',
+      notes: 'Chegar atrasados no trabalho juntos + Constrangimento 🫠 + Picolé misterioso + Dormir juntin'
+    },
+    {
+      id: 12,
+      title: 'Viagem Monte Green',
+      date: '06-08 Dez',
+      location: 'Monte Green',
+      type: 'past',
+      photo: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=1000&auto=format&fit=crop',
+      notes: 'Moto + Filme de terror + Fondue com vinho + Amanda louquinha e Alex putinho + Amorzinho + Rock + Cavalos'
+    },
+    {
+      id: 11,
+      title: 'Lingerie & Viagem',
+      date: '05 Dez',
+      location: 'Indaiatuba',
+      type: 'past',
+      notes: 'Lingerie 🤭 + Alex em Indaiá para viajarmos'
+    },
+    {
+      id: 10,
+      title: 'Conhecendo o Sogro',
+      date: '02 Dez',
+      location: 'São Paulo',
+      type: 'past',
+      notes: 'Conhecer pai do Alex de surpresa 🫣 + Restaurante árabe + Dormir braçadin'
+    },
+    {
+      id: 9,
+      title: 'Preguiça & Missa',
+      date: '30 Nov',
+      location: 'Indaiatuba',
+      type: 'past',
+      notes: 'Dia da preguiça + Gov + Missa com tia e prima'
+    },
+    {
+      id: 8,
+      title: 'Jantinha no Deck',
+      date: '29 Nov',
+      location: 'Indaiatuba',
+      type: 'past',
+      notes: 'Jantinha na casa da esfirra + Conversas no deck até tarde'
+    },
+    {
+      id: 7,
+      title: 'Rolê em SP',
+      date: '26 Nov',
+      location: 'São Paulo',
+      type: 'past',
+      notes: 'Atacadão + Shopping + Olive Garden + Rodoviária'
+    },
+    {
+      id: 6,
+      title: 'Corrida & Primeira Noite',
+      date: '24 Nov',
+      location: 'Indaiatuba',
+      type: 'past',
+      notes: 'Corrida + Piquenique + Mirim + Restaurante da Valéria + Primeira vez na Igreja + Pastel + Dormirmos Juntos'
+    },
+    {
+      id: 5,
+      title: 'Rolê Gastronômico',
+      date: '23 Nov',
+      location: 'Indaiatuba',
+      type: 'past',
+      notes: 'Kit da corrida + Almoçamos + Boteco do Andre + Cupido Sqn + Dogão'
+    },
+    {
+      id: 4,
+      title: 'A Moto Power Rangers',
+      date: '20 Nov',
+      location: 'Ibirapuera, SP',
+      type: 'past',
+      photo: 'https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?q=80&w=1000&auto=format&fit=crop',
+      notes: 'Boteco do Senador + Ibirapuera + Primeira vez de moto (Capacete Power Rangers)'
+    },
+    {
+      id: 3,
+      title: 'Presencial Juntos',
+      date: '19 Nov',
+      location: 'São Paulo',
+      type: 'past',
+      notes: 'Carícias + Almoço + Beach Tênis + Airbnb + Doidinho'
     },
     {
       id: 2,
-      title: 'Primeiro "Eu te amo"',
-      date: '25 Dez 2025',
-      location: 'Casa da Sogra',
+      title: 'Luzes e Macarrão',
+      date: '15 Nov',
+      location: 'Parque Ecológico',
       type: 'past',
-      notes: 'No Natal, com a família reunida.'
+      notes: 'Clube das Mulheres + Parque Ecológico Luzes + Macarrão'
+    },
+    {
+      id: 1,
+      title: 'O Início',
+      date: '08-09 Nov',
+      location: 'Indaiatuba',
+      type: 'past',
+      notes: 'Pagode + Beijo + Rock + Felicidade + Sono + Mirim + Conversas + Ordem e Caos'
     }
   ];
 
   useEffect(() => {
     const calculateCommute = async () => {
       const loader = new Loader({
-        // Explicitly use the key provided in firebaseConfig which usually supports Maps
-        // Removing process.env.API_KEY to avoid conflict with GenAI keys
         apiKey: 'AIzaSyDeiFzYLw8Z4Bo_BebAnJ_eYO_OGyBLdQU',
         version: "weekly",
       });
@@ -352,7 +448,7 @@ const Dates: React.FC = () => {
                 )}
                 
                 {event.notes && (
-                  <p className="text-slate-600 text-sm italic bg-slate-50 p-3 rounded-lg">
+                  <p className="text-slate-600 text-sm italic bg-slate-50 p-3 rounded-lg border-l-2 border-rose-200">
                     "{event.notes}"
                   </p>
                 )}

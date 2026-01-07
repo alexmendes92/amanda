@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Moon, BookOpen, Image, Dumbbell, CalendarHeart, Tv, Pill, Music } from 'lucide-react';
+import { Home, Moon, BookOpen, Image, Dumbbell, CalendarHeart, Tv, Pill, Music, ListTodo } from 'lucide-react';
 import { AppTab } from '../types';
 
 interface NavigationProps {
@@ -19,6 +19,15 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
         <span className="text-[9px] font-medium">Início</span>
       </button>
 
+      {/* Habits Tab (New) */}
+      <button 
+        onClick={() => onTabChange(AppTab.HABITS)}
+        className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.HABITS ? 'text-emerald-600' : 'text-slate-300'}`}
+      >
+        <ListTodo className={`w-5 h-5 ${activeTab === AppTab.HABITS ? 'fill-emerald-100' : ''}`} />
+        <span className="text-[9px] font-medium">Hábitos</span>
+      </button>
+
       <button 
         onClick={() => onTabChange(AppTab.SLEEP)}
         className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.SLEEP ? 'text-indigo-600' : 'text-slate-300'}`}
@@ -35,7 +44,6 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
         <span className="text-[9px] font-medium">Musa</span>
       </button>
 
-      {/* Music Tab (New) */}
       <button 
         onClick={() => onTabChange(AppTab.PLAYLIST)}
         className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.PLAYLIST ? 'text-rose-600' : 'text-slate-300'}`}

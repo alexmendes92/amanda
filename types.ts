@@ -63,4 +63,5 @@ export enum AppTab {
   FANDOM = 'fandom',
   SUPPLEMENTS = 'supplements',
   PLAYLIST = 'playlist',
+  HABITS = 'habits',
 }

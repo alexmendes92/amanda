@@ -13,6 +13,7 @@ import Dates from './components/Dates';
 import Fandom from './components/Fandom';
 import Supplements from './components/Supplements';
 import Playlist from './components/Playlist';
+import Habits from './components/Habits';
 import { UserCircle2 } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -64,6 +65,11 @@ const App: React.FC = () => {
                     <span className="block text-2xl mb-1">🍑</span>
                     <span className="font-bold text-rose-900 text-sm">Projeto Musa</span>
                     <p className="text-xs text-rose-600/70">Treino, Dieta & Shape</p>
+                 </button>
+                 <button onClick={() => setActiveTab(AppTab.HABITS)} className="p-4 bg-emerald-50 rounded-2xl text-left hover:bg-emerald-100 transition-colors">
+                    <span className="block text-2xl mb-1">✅</span>
+                    <span className="font-bold text-emerald-900 text-sm">Hábitos</span>
+                    <p className="text-xs text-emerald-600/70">Rotina & Constância</p>
                  </button>
                  <button onClick={() => setActiveTab(AppTab.SUPPLEMENTS)} className="p-4 bg-teal-50 rounded-2xl text-left hover:bg-teal-100 transition-colors">
                     <span className="block text-2xl mb-1">💊</span>
@@ -141,6 +147,12 @@ const App: React.FC = () => {
           {activeTab === AppTab.SUPPLEMENTS && (
             <div className="animate-in slide-in-from-right duration-300">
               <Supplements />
+            </div>
+          )}
+
+          {activeTab === AppTab.HABITS && (
+            <div className="animate-in slide-in-from-right duration-300">
+              <Habits />
             </div>
           )}
 
