@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Moon, BookOpen, Image, Dumbbell, CalendarHeart, Tv, Pill, Music, ListTodo } from 'lucide-react';
+import { Home, Activity, Heart, Sparkles } from 'lucide-react';
 import { AppTab } from '../types';
 
 interface NavigationProps {
@@ -9,88 +9,71 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
+  
+  // Helper para verificar qual categoria está ativa (incluindo o Menu e as Ferramentas)
+  const isRoutineActive = [
+    AppTab.ROUTINE_MENU, 
+    AppTab.FITNESS, 
+    AppTab.SLEEP, 
+    AppTab.HABITS, 
+    AppTab.SUPPLEMENTS, 
+    AppTab.INSIGHTS
+  ].includes(activeTab);
+
+  const isLoveActive = [
+    AppTab.LOVE_MENU, 
+    AppTab.DATES, 
+    AppTab.PLAYLIST, 
+    AppTab.GALLERY
+  ].includes(activeTab);
+
+  const isLeisureActive = [
+    AppTab.LEISURE_MENU, 
+    AppTab.FANDOM, 
+    AppTab.DEVOTIONAL
+  ].includes(activeTab);
+
+  const isHomeActive = activeTab === AppTab.HOME;
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-2 py-4 flex justify-between items-center z-50 pb-8 md:pb-4 shadow-[0_-5px_10px_rgba(0,0,0,0.02)] overflow-x-auto no-scrollbar">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-between items-center z-50 pb-8 md:pb-4 shadow-[0_-5px_10px_rgba(0,0,0,0.02)]">
+      
+      {/* 1. INÍCIO */}
       <button 
         onClick={() => onTabChange(AppTab.HOME)}
-        className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.HOME ? 'text-indigo-600' : 'text-slate-300'}`}
+        className={`flex flex-col items-center gap-1 w-16 transition-all duration-300 ${isHomeActive ? 'text-indigo-600 -translate-y-1' : 'text-slate-400'}`}
       >
-        <Home className={`w-5 h-5 ${activeTab === AppTab.HOME ? 'fill-indigo-100' : ''}`} />
-        <span className="text-[9px] font-medium">Início</span>
+        <Home className={`w-6 h-6 ${isHomeActive ? 'fill-indigo-100 stroke-2' : 'stroke-[1.5]'}`} />
+        <span className={`text-[10px] font-bold ${isHomeActive ? 'opacity-100' : 'opacity-70'}`}>Início</span>
       </button>
 
-      {/* Habits Tab (New) */}
+      {/* 2. ROTINA (Hub) */}
       <button 
-        onClick={() => onTabChange(AppTab.HABITS)}
-        className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.HABITS ? 'text-emerald-600' : 'text-slate-300'}`}
+        onClick={() => onTabChange(AppTab.ROUTINE_MENU)} 
+        className={`flex flex-col items-center gap-1 w-16 transition-all duration-300 ${isRoutineActive ? 'text-emerald-600 -translate-y-1' : 'text-slate-400'}`}
       >
-        <ListTodo className={`w-5 h-5 ${activeTab === AppTab.HABITS ? 'fill-emerald-100' : ''}`} />
-        <span className="text-[9px] font-medium">Hábitos</span>
+        <Activity className={`w-6 h-6 ${isRoutineActive ? 'fill-emerald-100 stroke-2' : 'stroke-[1.5]'}`} />
+        <span className={`text-[10px] font-bold ${isRoutineActive ? 'opacity-100' : 'opacity-70'}`}>Rotina</span>
       </button>
 
+      {/* 3. NÓS (Hub) */}
       <button 
-        onClick={() => onTabChange(AppTab.SLEEP)}
-        className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.SLEEP ? 'text-indigo-600' : 'text-slate-300'}`}
+        onClick={() => onTabChange(AppTab.LOVE_MENU)} 
+        className={`flex flex-col items-center gap-1 w-16 transition-all duration-300 ${isLoveActive ? 'text-rose-500 -translate-y-1' : 'text-slate-400'}`}
       >
-        <Moon className={`w-5 h-5 ${activeTab === AppTab.SLEEP ? 'fill-indigo-100' : ''}`} />
-        <span className="text-[9px] font-medium">Sono</span>
+        <Heart className={`w-6 h-6 ${isLoveActive ? 'fill-rose-100 stroke-2' : 'stroke-[1.5]'}`} />
+        <span className={`text-[10px] font-bold ${isLoveActive ? 'opacity-100' : 'opacity-70'}`}>Nós</span>
       </button>
 
+      {/* 4. LAZER (Hub) */}
       <button 
-        onClick={() => onTabChange(AppTab.FITNESS)}
-        className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.FITNESS ? 'text-indigo-600' : 'text-slate-300'}`}
+        onClick={() => onTabChange(AppTab.LEISURE_MENU)} 
+        className={`flex flex-col items-center gap-1 w-16 transition-all duration-300 ${isLeisureActive ? 'text-amber-500 -translate-y-1' : 'text-slate-400'}`}
       >
-        <Dumbbell className={`w-5 h-5 ${activeTab === AppTab.FITNESS ? 'fill-indigo-100' : ''}`} />
-        <span className="text-[9px] font-medium">Musa</span>
+        <Sparkles className={`w-6 h-6 ${isLeisureActive ? 'fill-amber-100 stroke-2' : 'stroke-[1.5]'}`} />
+        <span className={`text-[10px] font-bold ${isLeisureActive ? 'opacity-100' : 'opacity-70'}`}>Lazer</span>
       </button>
 
-      <button 
-        onClick={() => onTabChange(AppTab.PLAYLIST)}
-        className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.PLAYLIST ? 'text-rose-600' : 'text-slate-300'}`}
-      >
-        <Music className={`w-5 h-5 ${activeTab === AppTab.PLAYLIST ? 'fill-rose-100' : ''}`} />
-        <span className="text-[9px] font-medium">Rádio</span>
-      </button>
-
-      <button 
-        onClick={() => onTabChange(AppTab.SUPPLEMENTS)}
-        className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.SUPPLEMENTS ? 'text-teal-600' : 'text-slate-300'}`}
-      >
-        <Pill className={`w-5 h-5 ${activeTab === AppTab.SUPPLEMENTS ? 'fill-teal-100' : ''}`} />
-        <span className="text-[9px] font-medium">Suple.</span>
-      </button>
-
-      <button 
-        onClick={() => onTabChange(AppTab.DATES)}
-        className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.DATES ? 'text-rose-500' : 'text-slate-300'}`}
-      >
-        <CalendarHeart className={`w-5 h-5 ${activeTab === AppTab.DATES ? 'fill-rose-100' : ''}`} />
-        <span className="text-[9px] font-medium">Dates</span>
-      </button>
-
-      <button 
-        onClick={() => onTabChange(AppTab.FANDOM)}
-        className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.FANDOM ? 'text-purple-600' : 'text-slate-300'}`}
-      >
-        <Tv className={`w-5 h-5 ${activeTab === AppTab.FANDOM ? 'fill-purple-100' : ''}`} />
-        <span className="text-[9px] font-medium">Séries</span>
-      </button>
-
-      <button 
-        onClick={() => onTabChange(AppTab.DEVOTIONAL)}
-        className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.DEVOTIONAL ? 'text-indigo-600' : 'text-slate-300'}`}
-      >
-        <BookOpen className={`w-5 h-5 ${activeTab === AppTab.DEVOTIONAL ? 'fill-indigo-100' : ''}`} />
-        <span className="text-[9px] font-medium">Fé</span>
-      </button>
-
-      <button 
-        onClick={() => onTabChange(AppTab.GALLERY)}
-        className={`flex flex-col items-center gap-1 min-w-[50px] ${activeTab === AppTab.GALLERY ? 'text-indigo-600' : 'text-slate-300'}`}
-      >
-        <Image className={`w-5 h-5 ${activeTab === AppTab.GALLERY ? 'fill-indigo-100' : ''}`} />
-        <span className="text-[9px] font-medium">Galeria</span>
-      </button>
     </div>
   );
 };

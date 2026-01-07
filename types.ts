@@ -55,6 +55,13 @@ export interface SongRecommendation {
 
 export enum AppTab {
   HOME = 'home',
+  
+  // Hubs (Menus)
+  ROUTINE_MENU = 'routine_menu',
+  LOVE_MENU = 'love_menu',
+  LEISURE_MENU = 'leisure_menu',
+
+  // Tools
   SLEEP = 'sleep',
   DEVOTIONAL = 'devotional',
   GALLERY = 'gallery',
@@ -64,4 +71,5 @@ export enum AppTab {
   SUPPLEMENTS = 'supplements',
   PLAYLIST = 'playlist',
   HABITS = 'habits',
+  INSIGHTS = 'insights',
 }

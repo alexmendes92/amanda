@@ -445,7 +445,7 @@ const Habits: React.FC = () => {
                   type="text" 
                   value={habit.title}
                   onChange={(e) => updateHabit(habit.id, { title: e.target.value })}
-                  className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-3 bg-white text-slate-900 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -454,7 +454,7 @@ const Habits: React.FC = () => {
                 <select 
                    value={habit.frequency}
                    onChange={(e) => updateHabit(habit.id, { frequency: e.target.value })}
-                   className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   className="w-full p-3 bg-white text-slate-900 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="Todos os dias">Todos os dias</option>
                   <option value="Dias da semana">Dias da semana</option>
@@ -496,7 +496,7 @@ const Habits: React.FC = () => {
                  placeholder="Ex: Beber 2L de água" 
                  value={newHabit.title}
                  onChange={(e) => setNewHabit({ ...newHabit, title: e.target.value })}
-                 className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+                 className="w-full p-3 bg-white text-slate-900 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-400"
                />
              </div>
 
@@ -505,7 +505,7 @@ const Habits: React.FC = () => {
                <select 
                  value={newHabit.frequency}
                  onChange={(e) => setNewHabit({ ...newHabit, frequency: e.target.value })}
-                 className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+                 className="w-full p-3 bg-white text-slate-900 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
                >
                  <option>Todos os dias</option>
                  <option>Dias da semana</option>
@@ -750,7 +750,7 @@ const Habits: React.FC = () => {
                         value={newItemText}
                         onChange={(e) => setNewItemText(e.target.value)}
                         placeholder="Adicionar novo item..."
-                        className="flex-1 bg-slate-50 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                        className="flex-1 bg-white text-slate-900 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none placeholder:text-slate-400"
                         onKeyPress={(e) => e.key === 'Enter' && handleAddItem(list.id)}
                       />
                       <button 

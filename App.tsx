@@ -14,21 +14,75 @@ import Fandom from './components/Fandom';
 import Supplements from './components/Supplements';
 import Playlist from './components/Playlist';
 import Habits from './components/Habits';
-import { UserCircle2 } from 'lucide-react';
+import Insights from './components/Insights';
+import { UserCircle2, ListTodo, Dumbbell, Moon, Pill, CalendarHeart, Music, Image, Tv, BookOpen, BarChart3, ChevronLeft, ArrowRight } from 'lucide-react';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserRole>('amanda');
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.HOME);
+
+  // Define qual "Menu Pai" o usuário deve voltar ao clicar em "Voltar"
+  const getParentTab = (): AppTab => {
+    if ([AppTab.FITNESS, AppTab.SLEEP, AppTab.HABITS, AppTab.SUPPLEMENTS, AppTab.INSIGHTS].includes(activeTab)) return AppTab.ROUTINE_MENU;
+    if ([AppTab.DATES, AppTab.PLAYLIST, AppTab.GALLERY].includes(activeTab)) return AppTab.LOVE_MENU;
+    if ([AppTab.FANDOM, AppTab.DEVOTIONAL].includes(activeTab)) return AppTab.LEISURE_MENU;
+    return AppTab.HOME;
+  };
+
+  const isSubPage = getParentTab() !== AppTab.HOME && ![AppTab.ROUTINE_MENU, AppTab.LOVE_MENU, AppTab.LEISURE_MENU, AppTab.HOME].includes(activeTab);
+
+  // Componente de Widget do Menu
+  const MenuWidget = ({ 
+    onClick, 
+    icon: Icon, 
+    title, 
+    subtitle, 
+    colorClass, 
+    bgClass 
+  }: { 
+    onClick: () => void, 
+    icon: any, 
+    title: string, 
+    subtitle: string, 
+    colorClass: string, 
+    bgClass: string 
+  }) => (
+    <button 
+      onClick={onClick}
+      className={`${bgClass} p-5 rounded-[2rem] border border-transparent hover:border-black/5 text-left transition-all duration-300 active:scale-95 group shadow-sm`}
+    >
+      <div className="flex justify-between items-start mb-3">
+        <div className={`p-3 rounded-2xl bg-white ${colorClass} shadow-sm group-hover:scale-110 transition-transform`}>
+          <Icon className="w-6 h-6" />
+        </div>
+        <div className="p-2 rounded-full bg-white/50 text-slate-400 group-hover:bg-white group-hover:text-slate-600 transition-colors">
+          <ArrowRight className="w-4 h-4" />
+        </div>
+      </div>
+      <h3 className="font-bold text-slate-800 text-lg leading-tight mb-1">{title}</h3>
+      <p className="text-xs text-slate-500 font-medium">{subtitle}</p>
+    </button>
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 flex justify-center">
       <div className="w-full max-w-md bg-white min-h-screen relative shadow-2xl overflow-hidden flex flex-col">
         
         {/* Header / Profile Switcher */}
-        <div className="pt-12 pb-6 px-6 flex justify-between items-center bg-white sticky top-0 z-40">
-           <div>
-              <h1 className="text-xl font-bold text-slate-900 tracking-tight">Nosso Mundo</h1>
-              <p className="text-xs text-slate-500">Amanda & Alex</p>
+        <div className="pt-12 pb-4 px-6 flex justify-between items-center bg-white sticky top-0 z-40 border-b border-slate-50">
+           <div className="flex items-center gap-2">
+              {isSubPage && (
+                <button 
+                  onClick={() => setActiveTab(getParentTab())}
+                  className="mr-1 p-2 -ml-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+              )}
+              <div>
+                <h1 className="text-xl font-bold text-slate-900 tracking-tight">Nosso Mundo</h1>
+                <p className="text-xs text-slate-500">Amanda & Alex</p>
+              </div>
            </div>
            
            <button 
@@ -37,100 +91,176 @@ const App: React.FC = () => {
            >
              <UserCircle2 className={`w-4 h-4 ${currentUser === 'amanda' ? 'text-pink-500' : 'text-blue-500'}`} />
              <span className="text-xs font-medium text-slate-700">
-               Ver como: {currentUser === 'alex' ? 'Alex' : 'Amanda'}
+               {currentUser === 'alex' ? 'Alex' : 'Amanda'}
              </span>
            </button>
         </div>
 
         {/* Main Content Area */}
-        <main className="flex-1 px-6 pb-24 overflow-y-auto no-scrollbar">
+        <main className="flex-1 px-6 pt-4 pb-24 overflow-y-auto no-scrollbar">
           
+          {/* --- HOME TAB --- */}
           {activeTab === AppTab.HOME && (
-            <div className="space-y-2 animate-in fade-in zoom-in-95 duration-500">
+            <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
               <Countdown currentUser={currentUser} />
               
-              {/* Weather Widgets */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <WeatherWidget />
                 <MoodWidget currentUser={currentUser} />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                 <button onClick={() => setActiveTab(AppTab.SLEEP)} className="p-4 bg-indigo-50 rounded-2xl text-left hover:bg-indigo-100 transition-colors">
-                    <span className="block text-2xl mb-1">💤</span>
-                    <span className="font-bold text-indigo-900 text-sm">Boletim</span>
-                    <p className="text-xs text-indigo-600/70">Como o benzin dormiu?</p>
-                 </button>
-                 <button onClick={() => setActiveTab(AppTab.FITNESS)} className="p-4 bg-rose-50 rounded-2xl text-left hover:bg-rose-100 transition-colors">
-                    <span className="block text-2xl mb-1">🍑</span>
-                    <span className="font-bold text-rose-900 text-sm">Projeto Musa</span>
-                    <p className="text-xs text-rose-600/70">Treino, Dieta & Shape</p>
-                 </button>
-                 <button onClick={() => setActiveTab(AppTab.HABITS)} className="p-4 bg-emerald-50 rounded-2xl text-left hover:bg-emerald-100 transition-colors">
-                    <span className="block text-2xl mb-1">✅</span>
-                    <span className="font-bold text-emerald-900 text-sm">Hábitos</span>
-                    <p className="text-xs text-emerald-600/70">Rotina & Constância</p>
-                 </button>
-                 <button onClick={() => setActiveTab(AppTab.SUPPLEMENTS)} className="p-4 bg-teal-50 rounded-2xl text-left hover:bg-teal-100 transition-colors">
-                    <span className="block text-2xl mb-1">💊</span>
-                    <span className="font-bold text-teal-900 text-sm">Suplementos</span>
-                    <p className="text-xs text-teal-600/70">Rotina & Detalhes</p>
-                 </button>
-                 <button onClick={() => setActiveTab(AppTab.PLAYLIST)} className="p-4 bg-slate-800 rounded-2xl text-left hover:bg-slate-700 transition-colors text-white shadow-lg">
-                    <span className="block text-2xl mb-1">🎸</span>
-                    <span className="font-bold text-white text-sm">Rádio Nossa</span>
-                    <p className="text-xs text-slate-300">Rock & Boyce Avenue</p>
-                 </button>
-                 <button onClick={() => setActiveTab(AppTab.DATES)} className="col-span-2 p-4 bg-rose-500 rounded-2xl text-left hover:bg-rose-600 transition-colors text-white shadow-lg shadow-rose-200">
-                    <span className="block text-2xl mb-1">📅</span>
-                    <span className="font-bold text-white text-sm">Encontros & História</span>
-                    <p className="text-xs text-rose-100">Próximo Date: Ilhabela</p>
-                 </button>
-                 <button onClick={() => setActiveTab(AppTab.DEVOTIONAL)} className="col-span-2 p-4 bg-amber-50 rounded-2xl text-left hover:bg-amber-100 transition-colors">
-                      <span className="block text-2xl mb-1">🙏</span>
-                      <span className="font-bold text-amber-900 text-sm">Devocional</span>
-                      <p className="text-xs text-amber-600/70">Fé Compartilhada</p>
-                 </button>
+              {/* Atalhos Rápidos Home */}
+              <div>
+                 <h3 className="text-sm font-bold text-slate-800 mb-3 px-1">Acesso Rápido</h3>
+                 <div className="grid grid-cols-2 gap-3">
+                    <button onClick={() => setActiveTab(AppTab.HABITS)} className="bg-emerald-50 p-4 rounded-2xl text-left border border-emerald-100">
+                       <ListTodo className="w-5 h-5 text-emerald-600 mb-2" />
+                       <span className="font-bold text-emerald-900 text-sm">Meus Hábitos</span>
+                    </button>
+                    <button onClick={() => setActiveTab(AppTab.SLEEP)} className="bg-indigo-50 p-4 rounded-2xl text-left border border-indigo-100">
+                       <Moon className="w-5 h-5 text-indigo-600 mb-2" />
+                       <span className="font-bold text-indigo-900 text-sm">Meu Sono</span>
+                    </button>
+                 </div>
               </div>
 
-              {/* Banner de Séries / Fandom */}
-              <button 
-                onClick={() => setActiveTab(AppTab.FANDOM)}
-                className={`w-full mt-4 p-5 rounded-2xl shadow-lg transition-all duration-300 bg-cover bg-center relative overflow-hidden group ${currentUser === 'alex' ? 'bg-slate-900' : 'bg-slate-800'}`}
-                style={{ 
-                  backgroundImage: currentUser === 'alex' 
-                    ? 'url("https://images.unsplash.com/photo-1626278664285-f796b96180af?q=80&w=2000&auto=format&fit=crop")' // Magic/Dark
-                    : 'url("https://images.unsplash.com/photo-1448375240586-dfd8d395ea6c?q=80&w=2000&auto=format&fit=crop")' // Forest/Fog
-                }}
-              >
-                 <div className="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-colors"></div>
-                 <div className="relative z-10 flex items-center justify-between text-white">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-1">
-                        {currentUser === 'alex' ? 'Mundo Bruxo' : 'Saga Crepúsculo'}
-                      </p>
-                      <h3 className="text-lg font-serif font-bold">
-                        {currentUser === 'alex' ? 'Acesse Hogwarts ⚡' : 'Ir para Forks 🌲'}
-                      </h3>
-                    </div>
-                    <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm">
-                      <span className="text-xl">📺</span>
-                    </div>
-                 </div>
-              </button>
-              
-              <div className="mt-6 p-5 bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl text-white shadow-lg shadow-pink-200">
+              <div className="mt-4 p-5 bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl text-white shadow-lg shadow-slate-200">
                  <p className="font-medium text-lg mb-1">
                    {currentUser === 'amanda' ? 'Bom dia, Princesa!' : 'Bom dia, Guerreiro!'}
                  </p>
-                 <p className="text-pink-100 text-sm opacity-90">
+                 <p className="text-slate-300 text-sm opacity-90">
                    {currentUser === 'amanda' 
-                     ? 'Já bebeu água hoje? O Alex quer ver você hidratada!' 
-                     : 'Não esqueça de elogiar o foco da Amanda hoje.'}
+                     ? 'Lembre-se: O Alex te ama mais que ontem.' 
+                     : 'Hoje é um ótimo dia para fazer a Amanda sorrir.'}
                  </p>
               </div>
             </div>
           )}
+
+          {/* --- ROUTINE HUB (Menu) --- */}
+          {activeTab === AppTab.ROUTINE_MENU && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+              <div className="px-1">
+                <h2 className="text-2xl font-bold text-slate-900">Hub de Rotina</h2>
+                <p className="text-slate-500 text-sm">Cuide do corpo e da mente.</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2">
+                  <MenuWidget 
+                    onClick={() => setActiveTab(AppTab.INSIGHTS)}
+                    icon={BarChart3}
+                    title="Resumo Geral"
+                    subtitle="Semáforo, Batalha & Love Coins"
+                    bgClass="bg-slate-100"
+                    colorClass="text-slate-600"
+                  />
+                </div>
+                <MenuWidget 
+                  onClick={() => setActiveTab(AppTab.HABITS)}
+                  icon={ListTodo}
+                  title="Hábitos"
+                  subtitle="Checklist Diário"
+                  bgClass="bg-emerald-50"
+                  colorClass="text-emerald-500"
+                />
+                <MenuWidget 
+                  onClick={() => setActiveTab(AppTab.FITNESS)}
+                  icon={Dumbbell}
+                  title="Musa Fitness"
+                  subtitle="Treino & Dieta"
+                  bgClass="bg-rose-50"
+                  colorClass="text-rose-500"
+                />
+                <MenuWidget 
+                  onClick={() => setActiveTab(AppTab.SLEEP)}
+                  icon={Moon}
+                  title="Sono"
+                  subtitle="Monitoramento"
+                  bgClass="bg-indigo-50"
+                  colorClass="text-indigo-500"
+                />
+                <MenuWidget 
+                  onClick={() => setActiveTab(AppTab.SUPPLEMENTS)}
+                  icon={Pill}
+                  title="Suples"
+                  subtitle="Farmacinha"
+                  bgClass="bg-teal-50"
+                  colorClass="text-teal-500"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* --- LOVE HUB (Menu) --- */}
+          {activeTab === AppTab.LOVE_MENU && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+              <div className="px-1">
+                <h2 className="text-2xl font-bold text-slate-900">Espaço Nós</h2>
+                <p className="text-slate-500 text-sm">Memórias e planos a dois.</p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                 <MenuWidget 
+                  onClick={() => setActiveTab(AppTab.DATES)}
+                  icon={CalendarHeart}
+                  title="Nossos Dates"
+                  subtitle="Histórico, Planejador & Contagem"
+                  bgClass="bg-rose-50"
+                  colorClass="text-rose-500"
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <MenuWidget 
+                    onClick={() => setActiveTab(AppTab.GALLERY)}
+                    icon={Image}
+                    title="Galeria"
+                    subtitle="Fotos Privadas"
+                    bgClass="bg-slate-100"
+                    colorClass="text-slate-600"
+                  />
+                  <MenuWidget 
+                    onClick={() => setActiveTab(AppTab.PLAYLIST)}
+                    icon={Music}
+                    title="Rádio"
+                    subtitle="Playlist IA"
+                    bgClass="bg-blue-50"
+                    colorClass="text-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* --- LEISURE HUB (Menu) --- */}
+          {activeTab === AppTab.LEISURE_MENU && (
+             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+              <div className="px-1">
+                <h2 className="text-2xl font-bold text-slate-900">Lazer & Alma</h2>
+                <p className="text-slate-500 text-sm">Para relaxar e agradecer.</p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <MenuWidget 
+                    onClick={() => setActiveTab(AppTab.DEVOTIONAL)}
+                    icon={BookOpen}
+                    title="Devocional"
+                    subtitle="Palavra do dia & Orações"
+                    bgClass="bg-amber-50"
+                    colorClass="text-amber-600"
+                  />
+                <MenuWidget 
+                  onClick={() => setActiveTab(AppTab.FANDOM)}
+                  icon={Tv}
+                  title="Fandom"
+                  subtitle="Séries, Quiz & Curiosidades"
+                  bgClass="bg-purple-50"
+                  colorClass="text-purple-600"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* --- CONTENT RENDERERS --- */}
 
           {activeTab === AppTab.SLEEP && (
             <div className="animate-in slide-in-from-right duration-300">
@@ -153,6 +283,12 @@ const App: React.FC = () => {
           {activeTab === AppTab.HABITS && (
             <div className="animate-in slide-in-from-right duration-300">
               <Habits />
+            </div>
+          )}
+          
+          {activeTab === AppTab.INSIGHTS && (
+            <div className="animate-in slide-in-from-right duration-300">
+              <Insights currentUser={currentUser} />
             </div>
           )}
 
