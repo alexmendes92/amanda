@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { UserRole, AppTab } from './types';
 import Navigation from './components/Navigation';
@@ -6,6 +7,9 @@ import Devotional from './components/Devotional';
 import Gallery from './components/Gallery';
 import Countdown from './components/Countdown';
 import FitnessTracker from './components/FitnessTracker';
+import WeatherWidget from './components/WeatherWidget';
+import Dates from './components/Dates';
+import Fandom from './components/Fandom';
 import { UserCircle2 } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -40,6 +44,10 @@ const App: React.FC = () => {
           {activeTab === AppTab.HOME && (
             <div className="space-y-2 animate-in fade-in zoom-in-95 duration-500">
               <Countdown currentUser={currentUser} />
+              
+              {/* Weather Widget Added Here */}
+              <WeatherWidget />
+
               <div className="grid grid-cols-2 gap-4">
                  <button onClick={() => setActiveTab(AppTab.SLEEP)} className="p-4 bg-indigo-50 rounded-2xl text-left hover:bg-indigo-100 transition-colors">
                     <span className="block text-2xl mb-1">💤</span>
@@ -51,17 +59,43 @@ const App: React.FC = () => {
                     <span className="font-bold text-rose-900 text-sm">Projeto Musa</span>
                     <p className="text-xs text-rose-600/70">Treino, Dieta & Shape</p>
                  </button>
-                 <button onClick={() => setActiveTab(AppTab.DEVOTIONAL)} className="col-span-2 p-4 bg-amber-50 rounded-2xl text-left hover:bg-amber-100 transition-colors flex items-center justify-between">
-                    <div>
+                 <button onClick={() => setActiveTab(AppTab.DATES)} className="p-4 bg-rose-500 rounded-2xl text-left hover:bg-rose-600 transition-colors text-white shadow-lg shadow-rose-200">
+                    <span className="block text-2xl mb-1">📅</span>
+                    <span className="font-bold text-white text-sm">Encontros</span>
+                    <p className="text-xs text-rose-100">Próximo Date & História</p>
+                 </button>
+                 <button onClick={() => setActiveTab(AppTab.DEVOTIONAL)} className="p-4 bg-amber-50 rounded-2xl text-left hover:bg-amber-100 transition-colors">
                       <span className="block text-2xl mb-1">🙏</span>
-                      <span className="font-bold text-amber-900 text-sm">Devocional & Oração</span>
+                      <span className="font-bold text-amber-900 text-sm">Devocional</span>
                       <p className="text-xs text-amber-600/70">Fé Compartilhada</p>
-                    </div>
-                    <div className="bg-amber-100 p-2 rounded-full">
-                      <span className="text-amber-600 text-xs font-bold">Hoje</span>
-                    </div>
                  </button>
               </div>
+
+              {/* Banner de Séries / Fandom */}
+              <button 
+                onClick={() => setActiveTab(AppTab.FANDOM)}
+                className={`w-full mt-4 p-5 rounded-2xl shadow-lg transition-all duration-300 bg-cover bg-center relative overflow-hidden group ${currentUser === 'alex' ? 'bg-slate-900' : 'bg-slate-800'}`}
+                style={{ 
+                  backgroundImage: currentUser === 'alex' 
+                    ? 'url("https://images.unsplash.com/photo-1626278664285-f796b96180af?q=80&w=2000&auto=format&fit=crop")' // Magic/Dark
+                    : 'url("https://images.unsplash.com/photo-1448375240586-dfd8d395ea6c?q=80&w=2000&auto=format&fit=crop")' // Forest/Fog
+                }}
+              >
+                 <div className="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-colors"></div>
+                 <div className="relative z-10 flex items-center justify-between text-white">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-1">
+                        {currentUser === 'alex' ? 'Mundo Bruxo' : 'Saga Crepúsculo'}
+                      </p>
+                      <h3 className="text-lg font-serif font-bold">
+                        {currentUser === 'alex' ? 'Acesse Hogwarts ⚡' : 'Ir para Forks 🌲'}
+                      </h3>
+                    </div>
+                    <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm">
+                      <span className="text-xl">📺</span>
+                    </div>
+                 </div>
+              </button>
               
               <div className="mt-6 p-5 bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl text-white shadow-lg shadow-pink-200">
                  <p className="font-medium text-lg mb-1">
@@ -88,9 +122,21 @@ const App: React.FC = () => {
             </div>
           )}
 
+          {activeTab === AppTab.DATES && (
+             <div className="animate-in slide-in-from-right duration-300">
+                <Dates />
+             </div>
+          )}
+
           {activeTab === AppTab.DEVOTIONAL && (
             <div className="h-full animate-in slide-in-from-right duration-300">
               <Devotional currentUser={currentUser} />
+            </div>
+          )}
+
+          {activeTab === AppTab.FANDOM && (
+            <div className="h-full animate-in slide-in-from-right duration-300">
+              <Fandom currentUser={currentUser} />
             </div>
           )}
 

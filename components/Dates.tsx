@@ -1,0 +1,294 @@
+import React, { useState, useEffect } from 'react';
+import { Calendar, MapPin, Clock, Heart, CheckCircle2, Plus, CalendarHeart, Navigation, Car, Building2, ArrowRight } from 'lucide-react';
+import { Loader } from "@googlemaps/js-api-loader";
+import Countdown from './Countdown';
+import WeatherWidget from './WeatherWidget';
+import MapWidget from './MapWidget';
+
+declare var google: any;
+
+interface DateEvent {
+  id: number;
+  title: string;
+  date: string;
+  location: string;
+  type: 'past' | 'future';
+  photo?: string; // URL da foto
+  notes?: string;
+}
+
+const Dates: React.FC = () => {
+  // Dados simulados (depois virão do banco de dados)
+  // Define next date for the countdown
+  const nextDate = new Date('2026-01-10T10:00:00');
+  
+  // Coordinates
+  const nextLocationCoords = { lat: -23.0903, lng: -47.2181 }; // Casa da Amanda (Indaiatuba)
+  const mpspCoords = { lat: -23.5518, lng: -46.6342 }; // MPSP Sede (Rua Riachuelo, SP)
+
+  // Commute State
+  const [commute, setCommute] = useState({ distance: '...', duration: '...' });
+  const [loadingCommute, setLoadingCommute] = useState(true);
+  
+  const [bucketList, setBucketList] = useState([
+    { id: 1, text: 'Jantar no Terraço Itália', done: false },
+    { id: 2, text: 'Acampar em São Francisco Xavier', done: false },
+    { id: 3, text: 'Cinema Drive-in', done: true },
+  ]);
+
+  const timeline: DateEvent[] = [
+    {
+      id: 1,
+      title: 'Viagem para Ilhabela',
+      date: '30 Dez 2025',
+      location: 'Ilha Beach Hotel',
+      type: 'past',
+      photo: 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?q=80&w=2070&auto=format&fit=crop', // Exemplo
+      notes: 'Onde quase perdemos o ônibus, mas foi perfeito.'
+    },
+    {
+      id: 2,
+      title: 'Primeiro "Eu te amo"',
+      date: '25 Dez 2025',
+      location: 'Casa da Sogra',
+      type: 'past',
+      notes: 'No Natal, com a família reunida.'
+    }
+  ];
+
+  useEffect(() => {
+    const calculateCommute = async () => {
+      const loader = new Loader({
+        apiKey: process.env.API_KEY || 'AIzaSyDZk_tY0pjDrAOWH1-t4a6chhHIUh43icM',
+        version: "weekly",
+      });
+
+      try {
+        await loader.load();
+        const service = new google.maps.DistanceMatrixService();
+        
+        service.getDistanceMatrix(
+          {
+            origins: [{ lat: nextLocationCoords.lat, lng: nextLocationCoords.lng }], // Indaiatuba
+            destinations: [{ lat: mpspCoords.lat, lng: mpspCoords.lng }], // MPSP SP
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC,
+          },
+          (response: any, status: any) => {
+            if (status === 'OK' && response) {
+              const element = response.rows[0].elements[0];
+              if (element.status === 'OK') {
+                setCommute({
+                  distance: element.distance.text,
+                  duration: element.duration.text
+                });
+              }
+            }
+            setLoadingCommute(false);
+          }
+        );
+      } catch (error) {
+        console.error("Error calculating distance:", error);
+        setLoadingCommute(false);
+        setCommute({ distance: '98 km', duration: '1h 20min' }); // Fallback visual
+      }
+    };
+
+    calculateCommute();
+  }, []);
+
+  const toggleBucketItem = (id: number) => {
+    setBucketList(bucketList.map(item => 
+      item.id === id ? { ...item, done: !item.done } : item
+    ));
+  };
+
+  const handleOpenMaps = () => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${nextLocationCoords.lat},${nextLocationCoords.lng}`;
+    window.open(url, '_blank');
+  };
+
+  const handleOpenMPSPRoute = () => {
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${nextLocationCoords.lat},${nextLocationCoords.lng}&destination=${mpspCoords.lat},${mpspCoords.lng}&travelmode=driving`;
+    window.open(url, '_blank');
+  };
+
+  return (
+    <div className="space-y-8 pb-24 animate-in fade-in duration-500">
+      
+      {/* 1. CARTÃO DE DESTAQUE: PRÓXIMO ENCONTRO */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <CalendarHeart className="w-6 h-6 text-rose-500" />
+          Próximo Encontro
+        </h2>
+        
+        <div className="bg-white rounded-3xl p-1 shadow-lg shadow-rose-100 border border-rose-100 relative overflow-hidden">
+          <div className="bg-rose-500 text-white p-6 rounded-t-2xl relative z-10">
+             <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-2xl font-bold">Indaiatuba</h3>
+                  <p className="text-rose-100 flex items-center gap-1 text-sm">
+                    <MapPin className="w-3 h-3" /> Casa da Amanda
+                  </p>
+                </div>
+                <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                   <Clock className="w-6 h-6 text-white" />
+                </div>
+             </div>
+             <Countdown targetDate={nextDate} minimal={true} />
+          </div>
+          
+          <div className="p-4 bg-white space-y-4">
+             <div>
+                <p className="text-xs text-slate-400 font-bold mb-2 uppercase tracking-wide">Previsão do Tempo</p>
+                <WeatherWidget /> 
+             </div>
+
+             <div>
+                <p className="text-xs text-slate-400 font-bold mb-2 uppercase tracking-wide">Localização</p>
+                <MapWidget lat={nextLocationCoords.lat} lng={nextLocationCoords.lng} label="Casa da Amanda" />
+             </div>
+             
+             <button 
+                onClick={handleOpenMaps}
+                className="w-full py-3 rounded-xl bg-indigo-50 text-indigo-600 font-bold text-sm flex items-center justify-center gap-2 hover:bg-indigo-100 transition-colors border border-indigo-100"
+             >
+                <Navigation className="w-4 h-4" />
+                Abrir Rota no Google Maps
+             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. CARD DESLOCAMENTO MPSP */}
+      <section>
+        <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+           <Car className="w-6 h-6 text-slate-600" />
+           Deslocamento Trabalho
+        </h2>
+        
+        <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-2xl"></div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-slate-400 font-bold uppercase">De: Indaiatuba</span>
+                <span className="text-lg font-bold">Casa</span>
+              </div>
+              <ArrowRight className="w-5 h-5 text-slate-500" />
+              <div className="flex flex-col gap-1 text-right">
+                <span className="text-xs text-slate-400 font-bold uppercase">Para: São Paulo</span>
+                <span className="text-lg font-bold flex items-center gap-2 justify-end">
+                  MPSP
+                  <Building2 className="w-4 h-4 text-slate-400" />
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-white/10 rounded-2xl p-4 flex items-center justify-between backdrop-blur-sm border border-white/5">
+              <div className="flex flex-col">
+                 <span className="text-xs text-slate-300 mb-1">Tempo Estimado</span>
+                 {loadingCommute ? (
+                   <span className="h-6 w-20 bg-white/20 animate-pulse rounded"></span>
+                 ) : (
+                   <span className="text-2xl font-bold text-white">{commute.duration}</span>
+                 )}
+              </div>
+              <div className="h-8 w-px bg-white/20"></div>
+              <div className="flex flex-col items-end">
+                 <span className="text-xs text-slate-300 mb-1">Distância</span>
+                 {loadingCommute ? (
+                   <span className="h-6 w-16 bg-white/20 animate-pulse rounded"></span>
+                 ) : (
+                   <span className="text-xl font-medium text-white">{commute.distance}</span>
+                 )}
+              </div>
+            </div>
+
+            <button 
+              onClick={handleOpenMPSPRoute}
+              className="w-full mt-4 bg-white text-slate-900 font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-100 transition-colors"
+            >
+              <Navigation className="w-4 h-4" />
+              Iniciar Rota Waze/Maps
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. LINHA DO TEMPO (Timeline) */}
+      <section>
+        <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+           <Heart className="w-6 h-6 text-rose-500" />
+           Nossa História
+        </h2>
+        
+        <div className="relative border-l-2 border-slate-200 ml-3 space-y-8">
+          {timeline.map((event) => (
+            <div key={event.id} className="ml-6 relative">
+              {/* Bolinha na linha do tempo */}
+              <div className="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-rose-500 border-4 border-white shadow-sm"></div>
+              
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                <span className="text-xs font-bold text-rose-500 uppercase">{event.date}</span>
+                <h3 className="text-lg font-bold text-slate-800">{event.title}</h3>
+                <p className="text-slate-500 text-sm flex items-center gap-1 mb-3">
+                  <MapPin className="w-3 h-3" /> {event.location}
+                </p>
+                
+                {event.photo && (
+                  <div className="rounded-xl overflow-hidden h-32 w-full mb-3">
+                    <img src={event.photo} alt={event.title} className="w-full h-full object-cover" />
+                  </div>
+                )}
+                
+                {event.notes && (
+                  <p className="text-slate-600 text-sm italic bg-slate-50 p-3 rounded-lg">
+                    "{event.notes}"
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 4. POTE DOS SONHOS (Bucket List) */}
+      <section>
+        <div className="flex justify-between items-center mb-4">
+           <h2 className="text-xl font-bold text-slate-800">Pote dos Sonhos</h2>
+           <button className="p-2 bg-rose-100 text-rose-600 rounded-full hover:bg-rose-200 transition-colors">
+             <Plus className="w-5 h-5" />
+           </button>
+        </div>
+        
+        <div className="grid gap-3">
+          {bucketList.map((item) => (
+            <div 
+              key={item.id}
+              onClick={() => toggleBucketItem(item.id)}
+              className={`p-4 rounded-xl flex items-center gap-3 cursor-pointer transition-all ${
+                item.done ? 'bg-green-50 border border-green-100' : 'bg-white border border-slate-100 shadow-sm'
+              }`}
+            >
+              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                item.done ? 'bg-green-500 border-green-500' : 'border-slate-300'
+              }`}>
+                {item.done && <CheckCircle2 className="w-4 h-4 text-white" />}
+              </div>
+              <span className={`font-medium ${item.done ? 'text-green-700 line-through' : 'text-slate-700'}`}>
+                {item.text}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+    </div>
+  );
+};
+
+export default Dates;

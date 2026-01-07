@@ -1,25 +1,50 @@
 import React, { useState } from 'react';
-import { Calendar, MapPin, Edit2 } from 'lucide-react';
+import { MapPin, Edit2 } from 'lucide-react';
 import { UserRole } from '../types';
 
 interface CountdownProps {
-  currentUser: UserRole;
+  currentUser?: UserRole;
+  targetDate?: Date | string;
+  minimal?: boolean;
 }
 
-const Countdown: React.FC<CountdownProps> = ({ currentUser }) => {
-  const [nextMeeting, setNextMeeting] = useState('2024-06-15');
+const Countdown: React.FC<CountdownProps> = ({ currentUser, targetDate, minimal = false }) => {
+  const [internalDate, setInternalDate] = useState('2024-06-15');
   const [isEditing, setIsEditing] = useState(false);
 
   const calculateDays = () => {
     const today = new Date();
-    const target = new Date(nextMeeting);
-    const diffTime = Math.abs(target.getTime() - today.getTime());
+    // Use targetDate if provided, otherwise internal state
+    const target = targetDate ? new Date(targetDate) : new Date(internalDate);
+    
+    // Reset hours to midnight for accurate day calculation
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const targetMidnight = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+    
+    const diffTime = targetMidnight.getTime() - todayMidnight.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
     return diffDays;
   };
 
   const daysLeft = calculateDays();
+  const isToday = daysLeft === 0;
+  const isPast = daysLeft < 0;
 
+  // Render logic for Minimal Mode (used in Dates tab)
+  if (minimal) {
+    return (
+      <div className="flex flex-col items-center justify-center">
+        <div className="flex items-baseline gap-2">
+          <span className="text-6xl font-bold text-white drop-shadow-sm">{Math.abs(daysLeft)}</span>
+          <span className="text-xl font-medium text-white/90">
+             {isToday ? 'Hoje!' : isPast ? 'dias atrás' : 'dias'}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Standard Card Mode (used in Home tab)
   return (
     <div className="relative overflow-hidden rounded-3xl bg-slate-900 text-white shadow-xl mb-8">
       {/* Background Image Overlay */}
@@ -38,16 +63,18 @@ const Countdown: React.FC<CountdownProps> = ({ currentUser }) => {
           <div className="flex items-center justify-center gap-2 mb-4">
              <input 
                type="date" 
-               value={nextMeeting} 
-               onChange={(e) => setNextMeeting(e.target.value)}
+               value={internalDate} 
+               onChange={(e) => setInternalDate(e.target.value)}
                className="text-slate-900 px-3 py-1 rounded text-lg"
              />
              <button onClick={() => setIsEditing(false)} className="text-sm bg-indigo-600 px-3 py-2 rounded">Salvar</button>
           </div>
         ) : (
           <div className="flex items-center justify-center gap-1 mb-2">
-            <span className="text-6xl font-bold">{daysLeft}</span>
-            <span className="text-xl font-light text-indigo-200 mt-4">dias</span>
+            <span className="text-6xl font-bold">{Math.abs(daysLeft)}</span>
+            <span className="text-xl font-light text-indigo-200 mt-4">
+              {isToday ? 'Hoje!' : isPast ? 'dias atrás' : 'dias'}
+            </span>
             {currentUser === 'alex' && (
               <button onClick={() => setIsEditing(true)} className="absolute top-4 right-4 text-white/50 hover:text-white">
                 <Edit2 className="w-4 h-4" />

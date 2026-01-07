@@ -1,3 +1,4 @@
+
 export type UserRole = 'alex' | 'amanda';
 
 export interface SleepRecord {
@@ -31,10 +32,19 @@ export interface StudyStatus {
   lastUpdated: string;
 }
 
+export interface WeatherData {
+  temp: number;
+  conditionCode: number; // WMO code
+  isDay: boolean;
+  locationName: string;
+}
+
 export enum AppTab {
   HOME = 'home',
   SLEEP = 'sleep',
   DEVOTIONAL = 'devotional',
   GALLERY = 'gallery',
   FITNESS = 'fitness',
+  DATES = 'dates',
+  FANDOM = 'fandom',
 }
