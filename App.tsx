@@ -1,11 +1,11 @@
 
+
 import React, { useState, useRef, useEffect } from 'react';
-import { UserRole, AppTab } from './types';
+import { UserRole, AppTab, SleepRecord, AmandaFitnessData } from './types';
 import Navigation from './components/Navigation';
 import SleepMonitor from './components/SleepMonitor';
 import Devotional from './components/Devotional';
 import Gallery from './components/Gallery';
-import Countdown from './components/Countdown';
 import FitnessTracker from './components/FitnessTracker';
 import WeatherWidget from './components/WeatherWidget';
 import MoodWidget from './components/MoodWidget';
@@ -13,22 +13,40 @@ import Dates from './components/Dates';
 import Fandom from './components/Fandom';
 import Supplements from './components/Supplements';
 import Playlist from './components/Playlist';
-import Habits from './components/Habits';
+import Lists from './components/Habits';
 import Insights from './components/Insights';
 import YouAreRight from './components/YouAreRight';
-import Finance from './components/Finance';
 import Cinema from './components/Cinema';
 import LoveBank from './components/LoveBank';
 import Cycle from './components/Cycle';
 import SOS from './components/SOS';
-import { QuoteWidget } from './components/DashboardWidgets'; // Removido FinanceWidget e SkincareWidget
+import Motivation from './components/Motivation';
+import { QuoteWidget } from './components/DashboardWidgets';
 
-import { UserCircle2, ListTodo, Dumbbell, Moon, Pill, CalendarHeart, Music, Image, Tv, BookOpen, BarChart3, ChevronLeft, ArrowRight, Activity, Heart, Sparkles, Crown, Sun, Wallet, Ticket, ShoppingCart, Lock, BrainCircuit, MessageCircle, AlertTriangle, BellRing, CheckCircle2, Flame, Target } from 'lucide-react';
+import { UserCircle2, ListTodo, Dumbbell, Moon, Pill, CalendarHeart, Music, Image, Tv, BookOpen, BarChart3, ChevronLeft, ArrowRight, Activity, Heart, Sparkles, Crown, Sun, Wallet, Ticket, ShoppingCart, Lock, BrainCircuit, MessageCircle, AlertTriangle, BellRing, CheckCircle2, Flame, Target, Lightbulb } from 'lucide-react';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserRole>('amanda');
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.HOME);
   const mainViewportRef = useRef<HTMLElement>(null);
+
+  // --- SHARED STATE ---
+  const [sleepRecord, setSleepRecord] = useState<SleepRecord>({
+    date: new Date().toLocaleDateString(),
+    hours: 7,
+    tookMelatonin: false,
+    usedGanchinho: false,
+    quality: 'ok'
+  });
+
+  const [amandaFitnessData, setAmandaFitnessData] = useState<AmandaFitnessData>({
+    meals: { cafe: false, almoco: false, lanche: false, jantar: false },
+    waterCount: 0,
+    workoutDone: false,
+    workoutType: null,
+    reportStatus: 'idle',
+    score: 0,
+  });
 
   useEffect(() => {
     if (mainViewportRef.current) {
@@ -37,9 +55,9 @@ const App: React.FC = () => {
   }, [activeTab, currentUser]);
 
   const getParentTab = (): AppTab => {
-    if ([AppTab.FITNESS, AppTab.SLEEP, AppTab.HABITS, AppTab.SUPPLEMENTS, AppTab.INSIGHTS, AppTab.MARKET].includes(activeTab)) return AppTab.ROUTINE_MENU;
-    if ([AppTab.DATES, AppTab.PLAYLIST, AppTab.GALLERY, AppTab.YOU_ARE_RIGHT, AppTab.LOVE_BANK, AppTab.CINEMA, AppTab.FINANCE, AppTab.SOS, AppTab.CYCLE].includes(activeTab)) return AppTab.LOVE_MENU;
-    if ([AppTab.FANDOM, AppTab.DEVOTIONAL, AppTab.CAPSULE, AppTab.QUIZ, AppTab.AI_COACH].includes(activeTab)) return AppTab.LEISURE_MENU;
+    if ([AppTab.FITNESS, AppTab.SLEEP, AppTab.LISTS, AppTab.SUPPLEMENTS, AppTab.INSIGHTS, AppTab.MARKET].includes(activeTab)) return AppTab.ROUTINE_MENU;
+    if ([AppTab.DATES, AppTab.PLAYLIST, AppTab.GALLERY, AppTab.YOU_ARE_RIGHT, AppTab.LOVE_BANK, AppTab.CINEMA, AppTab.SOS, AppTab.CYCLE].includes(activeTab)) return AppTab.LOVE_MENU;
+    if ([AppTab.FANDOM, AppTab.DEVOTIONAL, AppTab.CAPSULE, AppTab.QUIZ, AppTab.AI_COACH, AppTab.MOTIVATION].includes(activeTab)) return AppTab.LEISURE_MENU;
     if ([AppTab.ROUTINE_MENU, AppTab.LOVE_MENU, AppTab.LEISURE_MENU].includes(activeTab)) return AppTab.HOME;
     return AppTab.HOME;
   };
@@ -150,10 +168,10 @@ const App: React.FC = () => {
                            <span className="text-xs font-bold text-white/90 uppercase tracking-wide">
                              {currentUser === 'amanda' ? 'Meta do Dia' : 'Meta do Shape'}
                            </span>
-                           <span className="text-xs font-bold bg-white/20 px-2 py-0.5 rounded text-white">75%</span>
+                           <span className="text-xs font-bold bg-white/20 px-2 py-0.5 rounded text-white">{amandaFitnessData.score}%</span>
                         </div>
                         <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden mb-3">
-                           <div className="bg-white h-full w-3/4 rounded-full"></div>
+                           <div className="bg-white h-full rounded-full" style={{ width: `${amandaFitnessData.score}%` }}></div>
                         </div>
                         <div className="flex gap-2">
                            <div className="flex items-center gap-1.5 text-xs text-white/80 bg-white/10 px-2 py-1 rounded-lg">
@@ -249,7 +267,7 @@ const App: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <MenuWidget onClick={() => setActiveTab(AppTab.INSIGHTS)} icon={BarChart3} title="Resumo" subtitle="Stats" bgClass="bg-slate-100" colorClass="text-slate-600" />
-                  <MenuWidget onClick={() => setActiveTab(AppTab.HABITS)} icon={ListTodo} title="Hábitos" subtitle="Checklist" bgClass="bg-emerald-50" colorClass="text-emerald-500" />
+                  <MenuWidget onClick={() => setActiveTab(AppTab.LISTS)} icon={ListTodo} title="Listas" subtitle="Checklist" bgClass="bg-emerald-50" colorClass="text-emerald-500" />
                   <MenuWidget onClick={() => setActiveTab(AppTab.FITNESS)} icon={Dumbbell} title="Fitness" subtitle="Treino" bgClass="bg-orange-50" colorClass="text-orange-500" />
                   <MenuWidget onClick={() => setActiveTab(AppTab.SLEEP)} icon={Moon} title="Sono" subtitle="Monitor" bgClass="bg-indigo-50" colorClass="text-indigo-500" />
                   <MenuWidget onClick={() => setActiveTab(AppTab.SUPPLEMENTS)} icon={Pill} title="Suples" subtitle="Fármacos" bgClass="bg-teal-50" colorClass="text-teal-500" />
@@ -266,9 +284,6 @@ const App: React.FC = () => {
                   <p className="text-slate-500 text-xs font-medium">Memórias e planos a dois.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                   {/* Novos Recursos */}
-                   <div className="col-span-2"><MenuWidget onClick={() => setActiveTab(AppTab.FINANCE)} icon={Wallet} title="Fundo Viagem" subtitle="Nosso Cofrinho" bgClass="bg-emerald-50" colorClass="text-emerald-600" /></div>
-                   
                    <MenuWidget onClick={() => setActiveTab(AppTab.YOU_ARE_RIGHT)} icon={Crown} title="Razão" subtitle="Oráculo" bgClass="bg-yellow-50" colorClass="text-yellow-600" />
                    <MenuWidget onClick={() => setActiveTab(AppTab.LOVE_BANK)} icon={Ticket} title="Love Bank" subtitle="Cupons" bgClass="bg-rose-50" colorClass="text-rose-500" />
                    
@@ -292,20 +307,19 @@ const App: React.FC = () => {
                   <p className="text-slate-500 text-xs font-medium">Diversão e Conexão.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
+                  <MenuWidget onClick={() => setActiveTab(AppTab.MOTIVATION)} icon={Lightbulb} title="Motivação" subtitle="Inspiração" bgClass="bg-yellow-50" colorClass="text-yellow-600" />
                   <MenuWidget onClick={() => setActiveTab(AppTab.DEVOTIONAL)} icon={BookOpen} title="Fé" subtitle="Devocional" bgClass="bg-amber-50" colorClass="text-amber-600" />
                   <MenuWidget onClick={() => setActiveTab(AppTab.FANDOM)} icon={Sparkles} title="Fandom" subtitle="Quiz" bgClass="bg-purple-50" colorClass="text-purple-600" />
-                  <MenuWidget onClick={() => alert('Em breve: Cápsula do Tempo')} icon={Lock} title="Cápsula" subtitle="Futuro" bgClass="bg-slate-100" colorClass="text-slate-600" />
                   <MenuWidget onClick={() => alert('Em breve: Quiz Diário')} icon={BrainCircuit} title="Quiz" subtitle="Trivia" bgClass="bg-orange-50" colorClass="text-orange-600" />
-                  <MenuWidget onClick={() => alert('Em breve: Dr. Love')} icon={MessageCircle} title="Dr. Love" subtitle="Coach IA" bgClass="bg-pink-50" colorClass="text-pink-600" />
                 </div>
               </div>
             )}
 
             {/* --- RENDERIZAÇÃO DAS TELAS --- */}
-            {activeTab === AppTab.SLEEP && <SleepMonitor currentUser={currentUser} />}
-            {activeTab === AppTab.FITNESS && <FitnessTracker currentUser={currentUser} />}
+            {activeTab === AppTab.SLEEP && <SleepMonitor currentUser={currentUser} record={sleepRecord} onRecordChange={setSleepRecord} />}
+            {activeTab === AppTab.FITNESS && <FitnessTracker currentUser={currentUser} amandaData={amandaFitnessData} onAmandaDataChange={setAmandaFitnessData} />}
             {activeTab === AppTab.SUPPLEMENTS && <Supplements />}
-            {activeTab === AppTab.HABITS && <Habits />}
+            {activeTab === AppTab.LISTS && <Lists />}
             {activeTab === AppTab.INSIGHTS && <Insights currentUser={currentUser} />}
             {activeTab === AppTab.PLAYLIST && <Playlist currentUser={currentUser} />}
             {activeTab === AppTab.DATES && <Dates />}
@@ -315,11 +329,11 @@ const App: React.FC = () => {
             {activeTab === AppTab.YOU_ARE_RIGHT && <YouAreRight currentUser={currentUser} />}
             
             {/* Novas Telas */}
-            {activeTab === AppTab.FINANCE && <Finance />}
             {activeTab === AppTab.CINEMA && <Cinema />}
             {activeTab === AppTab.LOVE_BANK && <LoveBank />}
             {activeTab === AppTab.CYCLE && <Cycle />}
             {activeTab === AppTab.SOS && <SOS />}
+            {activeTab === AppTab.MOTIVATION && <Motivation />}
             
           </div>
         </main>

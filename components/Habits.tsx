@@ -1,24 +1,6 @@
 
 import React, { useState } from 'react';
-import { Check, Link, BarChart2, MoreVertical, BookOpen, WineOff, Footprints, Calendar as CalendarIcon, Filter, ArrowLeft, ChevronLeft, ChevronRight, ShoppingCart, Plus, CheckCircle2, Circle, Trophy, Flag, Wine, Sparkles, Trash2, X, Flame, Star, Save } from 'lucide-react';
-
-interface HabitDay {
-  date: number;
-  dayName: string;
-  fullDate: string; // YYYY-MM-DD
-}
-
-interface Habit {
-  id: string;
-  title: string;
-  frequency: string;
-  icon: React.ReactNode;
-  colorTheme: 'red' | 'purple' | 'green' | 'blue' | 'orange';
-  streak: number;
-  completionRate: number;
-  completedDays: string[];
-  history: number[]; 
-}
+import { ListTodo, Plus, CheckCircle2, Circle, Trash2, Edit2, PackageOpen } from 'lucide-react';
 
 interface ListItem {
   id: string;
@@ -29,223 +11,215 @@ interface ListItem {
 interface ShoppingList {
   id: string;
   title: string;
-  date: string;
-  category: 'shopping' | 'work' | 'goals';
   items: ListItem[];
-  color: string;
 }
 
-interface ChallengeTask {
-  day: number;
-  title: string;
-  description: string;
-  completed: boolean;
-}
-
-interface Challenge {
-  id: string;
-  title: string;
-  category: string;
-  currentDay: number;
-  totalDays: number;
-  image: string;
-  status: 'active' | 'available' | 'completed';
-  tasks: ChallengeTask[];
-}
-
-const Habits: React.FC = () => {
-  const [viewMode, setViewMode] = useState<'habits' | 'lists' | 'challenges'>('habits');
-  const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
-  const [detailTab, setDetailTab] = useState<'stats' | 'calendar' | 'edit'>('stats');
-  const [showAddHabit, setShowAddHabit] = useState(false);
-  const [newHabit, setNewHabit] = useState({ title: '', frequency: 'Todos os dias', color: 'blue' as const });
-  const [activeListId, setActiveListId] = useState<string>('l1');
-  const [newItemText, setNewItemText] = useState('');
-  const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
-
-  const generateWeekDays = (): HabitDay[] => {
-    const days: HabitDay[] = [];
-    const curr = new Date(); 
-    const first = curr.getDate() - curr.getDay() + 1; 
-    
-    for (let i = 0; i < 7; i++) {
-      const next = new Date(curr.setDate(first + i));
-      const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-      days.push({
-        date: next.getDate(),
-        dayName: dayNames[next.getDay()],
-        fullDate: next.toISOString().split('T')[0]
-      });
+const Lists: React.FC = () => {
+  const [lists, setLists] = useState<ShoppingList[]>([
+    { 
+      id: 'l1', 
+      title: 'Compras de Mercado', 
+      items: [
+        { id: 'i1', text: 'Maçãs Fuji', checked: true }, 
+        { id: 'i2', text: 'Pão integral', checked: false },
+        { id: 'i3', text: 'Peito de frango', checked: false }
+      ] 
+    },
+    { 
+      id: 'l2', 
+      title: 'Tarefas da Semana', 
+      items: [
+        { id: 'i4', text: 'Lavar o carro', checked: false }, 
+        { id: 'i5', text: 'Agendar dentista', checked: true }
+      ] 
     }
-    return days;
+  ]);
+  const [newItemText, setNewItemText] = useState('');
+  const [activeListId, setActiveListId] = useState<string | null>(lists.length > 0 ? 'l1' : null);
+
+  const activeList = lists.find(l => l.id === activeListId);
+
+  const addList = () => {
+    const newListName = prompt("Qual o nome da nova lista?");
+    if (newListName && newListName.trim() !== '') {
+      const newList: ShoppingList = {
+        id: Date.now().toString(),
+        title: newListName.trim(),
+        items: []
+      };
+      setLists(prev => [...prev, newList]);
+      setActiveListId(newList.id);
+    }
   };
 
-  const weekDays = generateWeekDays();
-  const todayStr = new Date().toISOString().split('T')[0];
-
-  const [habits, setHabits] = useState<Habit[]>([
-    {
-      id: '1', title: 'Não beber álcool', frequency: 'Todos os dias', icon: <WineOff className="w-5 h-5 text-white" />, colorTheme: 'red', streak: 12, completionRate: 100,
-      completedDays: [weekDays[0].fullDate, weekDays[1].fullDate, weekDays[2].fullDate, weekDays[3].fullDate], history: []
-    },
-    {
-      id: '2', title: 'Ler um livro', frequency: 'Semanal', icon: <BookOpen className="w-5 h-5 text-white" />, colorTheme: 'purple', streak: 3, completionRate: 70,
-      completedDays: [weekDays[1].fullDate, weekDays[3].fullDate], history: []
-    },
-    {
-      id: '3', title: 'Correr / Caminhar', frequency: '3x Semana', icon: <Footprints className="w-5 h-5 text-white" />, colorTheme: 'blue', streak: 4, completionRate: 83,
-      completedDays: [weekDays[2].fullDate], history: []
-    },
-    {
-      id: '4', title: 'Skincare', frequency: 'Todos os dias', icon: <Sparkles className="w-5 h-5 text-white" />, colorTheme: 'orange', streak: 25, completionRate: 98,
-      completedDays: weekDays.map(d => d.fullDate), history: []
+  const renameList = (listId: string) => {
+    const currentList = lists.find(l => l.id === listId);
+    if (!currentList) return;
+    const newName = prompt("Qual o novo nome da lista?", currentList.title);
+    if (newName && newName.trim() !== '') {
+      setLists(prev => prev.map(l => l.id === listId ? { ...l, title: newName.trim() } : l));
     }
-  ]);
+  };
 
-  const [lists, setLists] = useState<ShoppingList[]>([
-    { id: 'l1', title: 'Compras', date: '24/09', category: 'shopping', color: 'bg-orange-500', items: [{ id: 'i1', text: 'Maçãs', checked: true }, { id: 'i2', text: 'Pão', checked: true }] }
-  ]);
-
-  const [challenges, setChallenges] = useState<Challenge[]>([
-    {
-      id: 'c1', title: 'Autoconfiança', category: 'JORNADA', currentDay: 3, totalDays: 30, image: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=400', status: 'active',
-      tasks: Array.from({ length: 30 }, (_, i) => ({ day: i + 1, title: `Dia ${i + 1}`, description: 'Tarefa...', completed: i < 2 }))
-    }
-  ]);
-
-  const toggleHabit = (habitId: string, dateStr: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setHabits(prev => prev.map(habit => {
-      if (habit.id === habitId) {
-        const isCompleted = habit.completedDays.includes(dateStr);
-        const newCompletedDays = isCompleted ? habit.completedDays.filter(d => d !== dateStr) : [...habit.completedDays, dateStr];
-        return { ...habit, completedDays: newCompletedDays };
+  const deleteList = (listId: string) => {
+    if (confirm("Tem certeza que quer apagar esta lista?")) {
+      const remainingLists = lists.filter(l => l.id !== listId);
+      setLists(remainingLists);
+      if (activeListId === listId) {
+        setActiveListId(remainingLists.length > 0 ? remainingLists[0].id : null);
       }
-      return habit;
+    }
+  };
+  
+  const toggleItem = (listId: string, itemId: string) => {
+    setLists(prev => prev.map(list => {
+      if (list.id === listId) {
+        return {
+          ...list,
+          items: list.items.map(item => 
+            item.id === itemId ? { ...item, checked: !item.checked } : item
+          )
+        };
+      }
+      return list;
     }));
   };
 
-  const getThemeStyles = (theme: string) => {
-    switch (theme) {
-      case 'red': return { bg: 'bg-red-500', text: 'text-red-500', light: 'bg-red-50' };
-      case 'purple': return { bg: 'bg-purple-500', text: 'text-purple-500', light: 'bg-purple-50' };
-      case 'blue': return { bg: 'bg-blue-500', text: 'text-blue-500', light: 'bg-blue-50' };
-      case 'green': return { bg: 'bg-green-500', text: 'text-green-500', light: 'bg-green-50' };
-      case 'orange': return { bg: 'bg-orange-500', text: 'text-orange-500', light: 'bg-orange-50' };
-      default: return { bg: 'bg-slate-500', text: 'text-slate-500', light: 'bg-slate-50' };
-    }
+  const addItem = () => {
+    if (!newItemText.trim() || !activeListId) return;
+    
+    const newItem: ListItem = {
+      id: Date.now().toString(),
+      text: newItemText.trim(),
+      checked: false,
+    };
+
+    setLists(prev => prev.map(list => 
+      list.id === activeListId 
+        ? { ...list, items: [...list.items, newItem] } 
+        : list
+    ));
+    setNewItemText('');
   };
 
-  // --- VIEWS ---
+  const deleteItem = (listId: string, itemId: string) => {
+    setLists(prev => prev.map(list => 
+        list.id === listId
+            ? { ...list, items: list.items.filter(item => item.id !== itemId) }
+            : list
+    ));
+  };
+  
+  const progress = activeList && activeList.items.length > 0
+    ? Math.round((activeList.items.filter(i => i.checked).length / activeList.items.length) * 100) 
+    : 0;
 
-  // 1. DETAIL VIEW
-  if (selectedHabitId) {
-    const habit = habits.find(h => h.id === selectedHabitId);
-    if (!habit) return null;
-    const theme = getThemeStyles(habit.colorTheme);
-
-    return (
-      <div className="bg-slate-50 min-h-full animate-in fade-in slide-in-from-right">
-        <div className="bg-white px-4 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
-          <button onClick={() => { setSelectedHabitId(null); setDetailTab('stats'); }} className="p-2 hover:bg-slate-100 rounded-full">
-            <ArrowLeft className="w-5 h-5 text-slate-700" />
-          </button>
-          <h2 className="text-base font-bold text-slate-800">{habit.title}</h2>
-          <div className={`${theme.text}`}>{habit.icon}</div>
-        </div>
-
-        <div className="p-4 space-y-4">
-           {/* Estatísticas Simplificadas */}
-           <div className="bg-white rounded-3xl p-6 shadow-sm flex flex-col items-center">
-               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-4 bg-slate-100 px-2 py-0.5 rounded-full">Pontuação</span>
-               <div className="text-4xl font-bold text-slate-800">{habit.completionRate}%</div>
-           </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 2. MAIN VIEW
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-right duration-500">
       
-      {/* Header Tabs */}
-      <div className="px-2 pt-2">
-        <div className="bg-slate-100 p-1 rounded-xl flex">
-           {['habits', 'lists', 'challenges'].map(m => (
-             <button 
-               key={m}
-               onClick={() => setViewMode(m as any)}
-               className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${viewMode === m ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400'}`}
-             >
-               {m === 'habits' ? 'Hábitos' : m === 'lists' ? 'Listas' : 'Desafios'}
-             </button>
-           ))}
+      {/* Header */}
+      <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-emerald-800 flex items-center gap-2">
+            <ListTodo className="w-6 h-6" />
+            Minhas Listas
+          </h2>
+          <p className="text-xs text-emerald-600">Organize suas tarefas e compras.</p>
         </div>
+        <button onClick={addList} className="bg-emerald-500 text-white p-2 rounded-full shadow-lg shadow-emerald-200 active:scale-90 transition-transform">
+          <Plus className="w-5 h-5" />
+        </button>
       </div>
 
-      {viewMode === 'habits' && (
-        <div className="space-y-3 px-1">
-          <div className="flex justify-between items-center px-1">
-            <h2 className="text-xl font-bold text-slate-800">Seus Hábitos</h2>
-            <button className="p-1.5 bg-slate-900 text-white rounded-full"><Plus className="w-4 h-4" /></button>
+      {lists.length > 0 ? (
+        <>
+          {/* List Selector */}
+          <div className="flex gap-2 flex-wrap">
+            {lists.map(list => (
+              <button 
+                key={list.id}
+                onClick={() => setActiveListId(list.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  activeListId === list.id 
+                    ? 'bg-slate-800 text-white shadow' 
+                    : 'bg-slate-100 text-slate-500'
+                }`}
+              >
+                {list.title}
+              </button>
+            ))}
           </div>
 
-          {habits.map(habit => {
-            const styles = getThemeStyles(habit.colorTheme);
-            return (
-              <div 
-                key={habit.id} 
-                onClick={() => setSelectedHabitId(habit.id)}
-                className="bg-white rounded-[1.5rem] p-4 shadow-sm border border-slate-100 relative active:scale-[0.99] transition-transform"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="font-bold text-base text-slate-800">{habit.title}</h3>
-                    <span className={`inline-block mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${styles.light} ${styles.text}`}>
-                      {habit.frequency}
-                    </span>
-                  </div>
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-md ${styles.bg}`}>
-                    {habit.icon}
-                  </div>
+          {/* Active List View */}
+          {activeList && (
+            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-slate-800">{activeList.title}</h3>
+                  <button onClick={() => renameList(activeList.id)} className="text-slate-400 hover:text-slate-600"><Edit2 className="w-3 h-3" /></button>
+                  <button onClick={() => deleteList(activeList.id)} className="text-slate-400 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
                 </div>
-
-                {/* Compact Days Grid for Mobile */}
-                <div className="flex justify-between items-center">
-                  {weekDays.map((day) => {
-                    const isCompleted = habit.completedDays.includes(day.fullDate);
-                    return (
-                      <div key={day.fullDate} className="flex flex-col items-center gap-1">
-                        <span className="text-[9px] text-slate-400 font-medium">{day.dayName.charAt(0)}</span>
-                        <button
-                          onClick={(e) => toggleHabit(habit.id, day.fullDate, e)}
-                          className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
-                            isCompleted ? `${styles.bg} text-white` : `border border-slate-200 text-slate-400`
-                          }`}
-                        >
-                          {day.date}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
+                <span className="text-xs font-bold text-emerald-500">{progress || 0}%</span>
               </div>
-            );
-          })}
+              
+              <div className="w-full h-1 bg-slate-100 rounded-full mb-4">
+                 <div className="h-1 bg-emerald-500 rounded-full transition-all" style={{ width: `${progress || 0}%`}}></div>
+              </div>
+
+              <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
+                {activeList.items.length > 0 ? activeList.items.map(item => (
+                  <div key={item.id} className="flex items-center gap-3 group">
+                    <button onClick={() => toggleItem(activeList.id, item.id)}>
+                      {item.checked 
+                        ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> 
+                        : <Circle className="w-5 h-5 text-slate-300" />
+                      }
+                    </button>
+                    <span className={`flex-1 text-sm ${item.checked ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+                      {item.text}
+                    </span>
+                    <button 
+                      onClick={() => deleteItem(activeList.id, item.id)}
+                      className="w-6 h-6 flex items-center justify-center text-slate-300 hover:bg-red-50 hover:text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )) : (
+                  <p className="text-center text-xs text-slate-400 py-4">Nenhum item nesta lista ainda.</p>
+                )}
+              </div>
+
+              {/* Add Item Input */}
+              <div className="flex gap-2 pt-3 border-t border-slate-100">
+                <input 
+                  type="text"
+                  value={newItemText}
+                  onChange={(e) => setNewItemText(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && addItem()}
+                  placeholder="Adicionar novo item..."
+                  className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                />
+                <button onClick={addItem} className="bg-emerald-500 text-white p-2 rounded-lg aspect-square flex items-center justify-center active:scale-90 transition-transform">
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-sm">
+          <PackageOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+          <h3 className="font-bold text-slate-700">Nenhuma lista encontrada</h3>
+          <p className="text-sm text-slate-500 mt-1 mb-4">Clique no botão '+' para criar sua primeira lista!</p>
+          <button onClick={addList} className="bg-emerald-500 text-white font-bold text-sm px-4 py-2 rounded-lg flex items-center gap-2 mx-auto">
+            <Plus className="w-4 h-4" />
+            Criar Lista
+          </button>
         </div>
       )}
-
-      {/* Simplified List & Challenge Views would follow similar compact logic */}
-      {viewMode === 'lists' && (
-        <div className="text-center py-10 text-slate-400 text-sm">Listas Otimizadas para Mobile</div>
-      )}
-      {viewMode === 'challenges' && (
-        <div className="text-center py-10 text-slate-400 text-sm">Desafios Otimizados para Mobile</div>
-      )}
-
     </div>
   );
 };
 
-export default Habits;
+export default Lists;

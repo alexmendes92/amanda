@@ -1,4 +1,5 @@
 
+
 import { GoogleGenAI, Type } from "@google/genai";
 
 // Initialize Gemini Client
@@ -126,5 +127,53 @@ export const getPlaylistSuggestion = async (vibe: string): Promise<any[]> => {
       { title: "Photograph", artist: "Boyce Avenue (Cover)", reason: "Versão acústica perfeita para o momento." },
       { title: "Yellow", artist: "Coldplay", reason: "Para acalmar o coração." }
     ];
+  }
+};
+
+export const getMotivationQuote = async (type: 'classic' | 'funk'): Promise<{ quote: string, author: string }> => {
+  try {
+    const model = 'gemini-3-flash-preview';
+    let prompt = '';
+    
+    if (type === 'classic') {
+      prompt = `
+        Gere uma citação curta e poderosa de um filósofo estóico ou clássico (Sêneca, Marco Aurélio, Epicteto, Platão).
+        A citação deve ser sobre resiliência, autodomínio, felicidade ou virtude.
+        Traduza para o português do Brasil.
+        Retorne em JSON: { "quote": "...", "author": "..." }
+      `;
+    } else { // funk
+      prompt = `
+        Gere uma frase curta, motivacional e de auto-estima a partir da letra de um funkeiro brasileiro (Ex: MC Ryan SP, MC Hariel, Kayblack, Vulgo FK).
+        A frase deve ser sobre superação, sucesso, fé ou valor próprio.
+        NÃO use palavras de baixo calão. Mantenha o tom de "visão de cria".
+        Retorne em JSON: { "quote": "...", "author": "..." }
+      `;
+    }
+
+    const response = await ai.models.generateContent({
+      model,
+      contents: prompt,
+      config: { responseMimeType: 'application/json' },
+    });
+
+    const text = response.text;
+    if (!text) throw new Error("No response from Gemini");
+
+    return JSON.parse(text);
+
+  } catch (error) {
+    console.error("Motivation Error:", error);
+    if (type === 'classic') {
+      return {
+        quote: "A felicidade da sua vida depende da qualidade dos seus pensamentos.",
+        author: "Marco Aurélio"
+      };
+    } else {
+      return {
+        quote: "O impossível é só questão de opinião.",
+        author: "MC Hariel"
+      };
+    }
   }
 };

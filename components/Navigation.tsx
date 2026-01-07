@@ -15,7 +15,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
     AppTab.ROUTINE_MENU, 
     AppTab.FITNESS, 
     AppTab.SLEEP, 
-    AppTab.HABITS, 
+    AppTab.LISTS, 
     AppTab.SUPPLEMENTS, 
     AppTab.INSIGHTS
   ].includes(activeTab);
@@ -25,13 +25,18 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
     AppTab.DATES, 
     AppTab.PLAYLIST, 
     AppTab.GALLERY,
-    AppTab.YOU_ARE_RIGHT
+    AppTab.YOU_ARE_RIGHT,
+    AppTab.LOVE_BANK,
+    AppTab.CINEMA,
+    AppTab.CYCLE,
+    AppTab.SOS
   ].includes(activeTab);
 
   const isLeisureActive = [
     AppTab.LEISURE_MENU, 
     AppTab.FANDOM, 
-    AppTab.DEVOTIONAL
+    AppTab.DEVOTIONAL,
+    AppTab.MOTIVATION
   ].includes(activeTab);
 
   const isHomeActive = activeTab === AppTab.HOME;

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Battery, BatteryCharging, BatteryWarning, Moon, Info } from 'lucide-react';
 import { SleepRecord, UserRole } from '../types';
@@ -5,17 +6,11 @@ import { getSleepAdvice } from '../services/geminiService';
 
 interface SleepMonitorProps {
   currentUser: UserRole;
+  record: SleepRecord;
+  onRecordChange: (newRecord: SleepRecord) => void;
 }
 
-const SleepMonitor: React.FC<SleepMonitorProps> = ({ currentUser }) => {
-  const [record, setRecord] = useState<SleepRecord>({
-    date: new Date().toLocaleDateString(),
-    hours: 7,
-    tookMelatonin: false,
-    usedGanchinho: false,
-    quality: 'ok'
-  });
-
+const SleepMonitor: React.FC<SleepMonitorProps> = ({ currentUser, record, onRecordChange }) => {
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
   const [loadingAi, setLoadingAi] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -32,19 +27,22 @@ const SleepMonitor: React.FC<SleepMonitorProps> = ({ currentUser }) => {
 
   const handleSave = async () => {
     setIsSaved(true);
-    // In a real app, save to Firebase here
+    // O estado já está sendo atualizado em tempo real no componente pai (App.tsx).
+    // Este botão agora serve como uma confirmação visual para o usuário.
   };
 
   useEffect(() => {
-    // If user is Amanda and battery is low, get AI suggestion
-    if (currentUser === 'amanda' && record.hours < 6 && !aiSuggestion) {
+    // Se for a Amanda vendo um relatório de sono ruim do Alex, gera uma sugestão.
+    if (currentUser === 'amanda' && record.hours < 6) {
       setLoadingAi(true);
       getSleepAdvice(record.hours).then((suggestion) => {
         setAiSuggestion(suggestion);
         setLoadingAi(false);
       });
+    } else {
+      setAiSuggestion(null);
     }
-  }, [currentUser, record.hours, aiSuggestion]);
+  }, [currentUser, record.hours]);
 
   return (
     <div className="space-y-6">
@@ -98,7 +96,7 @@ const SleepMonitor: React.FC<SleepMonitorProps> = ({ currentUser }) => {
                 max="12" 
                 step="0.5"
                 value={record.hours}
-                onChange={(e) => setRecord({...record, hours: Number(e.target.value)})}
+                onChange={(e) => onRecordChange({...record, hours: Number(e.target.value)})}
                 className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
               />
               <div className="text-right text-indigo-600 font-bold mt-1">{record.hours}h</div>
@@ -109,7 +107,7 @@ const SleepMonitor: React.FC<SleepMonitorProps> = ({ currentUser }) => {
                 type="checkbox" 
                 id="melatonin"
                 checked={record.tookMelatonin}
-                onChange={(e) => setRecord({...record, tookMelatonin: e.target.checked})}
+                onChange={(e) => onRecordChange({...record, tookMelatonin: e.target.checked})}
                 className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
               />
               <label htmlFor="melatonin" className="text-slate-700">Tomei Melatonina</label>
@@ -120,7 +118,7 @@ const SleepMonitor: React.FC<SleepMonitorProps> = ({ currentUser }) => {
                 type="checkbox" 
                 id="ganchinho"
                 checked={record.usedGanchinho}
-                onChange={(e) => setRecord({...record, usedGanchinho: e.target.checked})}
+                onChange={(e) => onRecordChange({...record, usedGanchinho: e.target.checked})}
                 className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
               />
               <label htmlFor="ganchinho" className="text-slate-700">Usei o Ganchinho</label>
@@ -129,10 +127,11 @@ const SleepMonitor: React.FC<SleepMonitorProps> = ({ currentUser }) => {
             <button 
               onClick={handleSave}
               className={`w-full py-3 rounded-xl font-medium transition-all ${
-                isSaved ? 'bg-green-100 text-green-700' : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                isSaved ? 'bg-green-100 text-green-700 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'
               }`}
+              disabled={isSaved}
             >
-              {isSaved ? 'Enviado com sucesso! ✅' : 'Atualizar Status'}
+              {isSaved ? 'Enviado para Amanda! ✅' : 'Enviar Status'}
             </button>
           </div>
         </div>
@@ -142,7 +141,7 @@ const SleepMonitor: React.FC<SleepMonitorProps> = ({ currentUser }) => {
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
               <Info className="w-4 h-4 text-indigo-500" />
-              Detalhes do Sono
+              Relatório do Sono (Alex)
             </h3>
             <ul className="space-y-3">
               <li className="flex justify-between text-sm">

@@ -1,4 +1,5 @@
 
+
 export type UserRole = 'alex' | 'amanda';
 
 export interface SleepRecord {
@@ -54,6 +55,17 @@ export interface SongRecommendation {
   reason: string;
 }
 
+// Tipos de Dados Compartilhados
+export interface AmandaFitnessData {
+  meals: { cafe: boolean, almoco: boolean, lanche: boolean, jantar: boolean };
+  waterCount: number;
+  workoutDone: boolean;
+  workoutType: 'leg' | 'upper' | 'cardio' | 'yoga' | null;
+  reportStatus: 'idle' | 'sent' | 'approved';
+  score: number;
+}
+
+
 // Novos Tipos
 export interface Transaction {
   id: string;
@@ -97,12 +109,11 @@ export enum AppTab {
   FANDOM = 'fandom',
   SUPPLEMENTS = 'supplements',
   PLAYLIST = 'playlist',
-  HABITS = 'habits',
+  LISTS = 'lists',
   INSIGHTS = 'insights',
   YOU_ARE_RIGHT = 'you_are_right',
 
   // New Tools
-  FINANCE = 'finance',
   CINEMA = 'cinema',
   LOVE_BANK = 'love_bank',
   CYCLE = 'cycle',
@@ -111,4 +122,5 @@ export enum AppTab {
   CAPSULE = 'capsule',
   QUIZ = 'quiz',
   AI_COACH = 'ai_coach',
+  MOTIVATION = 'motivation',
 }
