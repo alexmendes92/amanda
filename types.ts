@@ -36,4 +36,5 @@ export enum AppTab {
   SLEEP = 'sleep',
   DEVOTIONAL = 'devotional',
   GALLERY = 'gallery',
+  FITNESS = 'fitness',
 }

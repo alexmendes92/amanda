@@ -5,6 +5,7 @@ import SleepMonitor from './components/SleepMonitor';
 import Devotional from './components/Devotional';
 import Gallery from './components/Gallery';
 import Countdown from './components/Countdown';
+import FitnessTracker from './components/FitnessTracker';
 import { UserCircle2 } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -45,10 +46,20 @@ const App: React.FC = () => {
                     <span className="font-bold text-indigo-900 text-sm">Boletim</span>
                     <p className="text-xs text-indigo-600/70">Como o benzin dormiu?</p>
                  </button>
-                 <button onClick={() => setActiveTab(AppTab.DEVOTIONAL)} className="p-4 bg-amber-50 rounded-2xl text-left hover:bg-amber-100 transition-colors">
-                    <span className="block text-2xl mb-1">🙏</span>
-                    <span className="font-bold text-amber-900 text-sm">Oração</span>
-                    <p className="text-xs text-amber-600/70">Pedidos & Palavra</p>
+                 <button onClick={() => setActiveTab(AppTab.FITNESS)} className="p-4 bg-rose-50 rounded-2xl text-left hover:bg-rose-100 transition-colors">
+                    <span className="block text-2xl mb-1">🍑</span>
+                    <span className="font-bold text-rose-900 text-sm">Projeto Musa</span>
+                    <p className="text-xs text-rose-600/70">Treino, Dieta & Shape</p>
+                 </button>
+                 <button onClick={() => setActiveTab(AppTab.DEVOTIONAL)} className="col-span-2 p-4 bg-amber-50 rounded-2xl text-left hover:bg-amber-100 transition-colors flex items-center justify-between">
+                    <div>
+                      <span className="block text-2xl mb-1">🙏</span>
+                      <span className="font-bold text-amber-900 text-sm">Devocional & Oração</span>
+                      <p className="text-xs text-amber-600/70">Fé Compartilhada</p>
+                    </div>
+                    <div className="bg-amber-100 p-2 rounded-full">
+                      <span className="text-amber-600 text-xs font-bold">Hoje</span>
+                    </div>
                  </button>
               </div>
               
@@ -58,8 +69,8 @@ const App: React.FC = () => {
                  </p>
                  <p className="text-pink-100 text-sm opacity-90">
                    {currentUser === 'amanda' 
-                     ? 'Lembre-se de verificar se o Alex descansou bem hoje.' 
-                     : 'Não esqueça de marcar seu sono para a Amanda não preocupar.'}
+                     ? 'Já bebeu água hoje? O Alex quer ver você hidratada!' 
+                     : 'Não esqueça de elogiar o foco da Amanda hoje.'}
                  </p>
               </div>
             </div>
@@ -68,6 +79,12 @@ const App: React.FC = () => {
           {activeTab === AppTab.SLEEP && (
             <div className="animate-in slide-in-from-right duration-300">
               <SleepMonitor currentUser={currentUser} />
+            </div>
+          )}
+
+          {activeTab === AppTab.FITNESS && (
+            <div className="animate-in slide-in-from-right duration-300">
+              <FitnessTracker currentUser={currentUser} />
             </div>
           )}
 
