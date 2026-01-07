@@ -164,7 +164,7 @@ const Dates: React.FC = () => {
   useEffect(() => {
     const calculateCommute = async () => {
       const loader = new Loader({
-        apiKey: 'AIzaSyDeiFzYLw8Z4Bo_BebAnJ_eYO_OGyBLdQU',
+        apiKey: 'AIzaSyDZk_tY0pjDrAOWH1-t4a6chhHIUh43icM',
         version: "weekly",
       });
 

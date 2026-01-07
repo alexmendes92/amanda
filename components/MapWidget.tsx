@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { Loader } from "@googlemaps/js-api-loader";
 
@@ -13,9 +14,7 @@ const MapWidget: React.FC<MapWidgetProps> = ({ lat, lng, label }) => {
   useEffect(() => {
     const initMap = async () => {
       const loader = new Loader({
-        // Explicitly use the key provided in firebaseConfig which usually supports Maps
-        // Removing process.env.API_KEY to avoid conflict with GenAI keys
-        apiKey: 'AIzaSyDeiFzYLw8Z4Bo_BebAnJ_eYO_OGyBLdQU',
+        apiKey: 'AIzaSyDZk_tY0pjDrAOWH1-t4a6chhHIUh43icM',
         version: "weekly",
       });
 

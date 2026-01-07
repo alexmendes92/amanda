@@ -72,4 +72,5 @@ export enum AppTab {
   PLAYLIST = 'playlist',
   HABITS = 'habits',
   INSIGHTS = 'insights',
+  YOU_ARE_RIGHT = 'you_are_right', // Nova funcionalidade
 }

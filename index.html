@@ -1,16 +1,55 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Nosso Mundo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-      body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-      /* Custom scrollbar for gallery */
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      /* Reset básico para sensação de App */
+      html, body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8fafc;
+        overscroll-behavior-y: none; /* Previne o 'bounce' da página inteira */
+        height: 100%;
+        width: 100%;
+        overflow: hidden; /* O scroll é gerenciado pelo container React */
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Esconde scrollbar mas mantém funcionalidade (Chrome/Safari/Opera) */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      
+      /* Esconde scrollbar (IE, Edge and Firefox) */
+      .no-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+      }
+
+      /* Remove o highlight azul padrão ao tocar em botões no mobile */
+      * {
+        -webkit-tap-highlight-color: transparent;
+        user-select: none; /* Previne seleção de texto acidental (exceto inputs) */
+      }
+      
+      input, textarea {
+        user-select: text;
+      }
+
+      /* Safe Area para iPhones com Notch */
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top);
+      }
     </style>
   <script type="importmap">
 {
@@ -26,6 +65,6 @@
 </script>
 </head>
   <body>
-    <div id="root"></div>
+    <div id="root" class="h-full w-full"></div>
   </body>
 </html>
