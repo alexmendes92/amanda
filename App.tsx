@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { UserRole, AppTab } from './types';
-import Navigation from './components/Navigation';
 import SleepMonitor from './components/SleepMonitor';
 import Devotional from './components/Devotional';
 import Gallery from './components/Gallery';
@@ -15,23 +14,28 @@ import Supplements from './components/Supplements';
 import Playlist from './components/Playlist';
 import Habits from './components/Habits';
 import Insights from './components/Insights';
-import { UserCircle2, ListTodo, Dumbbell, Moon, Pill, CalendarHeart, Music, Image, Tv, BookOpen, BarChart3, ChevronLeft, ArrowRight } from 'lucide-react';
+import { UserCircle2, ListTodo, Dumbbell, Moon, Pill, CalendarHeart, Music, Image, Tv, BookOpen, BarChart3, ChevronLeft, ArrowRight, Activity, Heart, Sparkles } from 'lucide-react';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserRole>('amanda');
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.HOME);
 
-  // Define qual "Menu Pai" o usuário deve voltar ao clicar em "Voltar"
+  // Lógica de Navegação (Stack System)
   const getParentTab = (): AppTab => {
+    // Nível 2 (Ferramentas) -> Nível 1 (Menus)
     if ([AppTab.FITNESS, AppTab.SLEEP, AppTab.HABITS, AppTab.SUPPLEMENTS, AppTab.INSIGHTS].includes(activeTab)) return AppTab.ROUTINE_MENU;
     if ([AppTab.DATES, AppTab.PLAYLIST, AppTab.GALLERY].includes(activeTab)) return AppTab.LOVE_MENU;
     if ([AppTab.FANDOM, AppTab.DEVOTIONAL].includes(activeTab)) return AppTab.LEISURE_MENU;
+    
+    // Nível 1 (Menus) -> Nível 0 (Home)
+    if ([AppTab.ROUTINE_MENU, AppTab.LOVE_MENU, AppTab.LEISURE_MENU].includes(activeTab)) return AppTab.HOME;
+    
     return AppTab.HOME;
   };
 
-  const isSubPage = getParentTab() !== AppTab.HOME && ![AppTab.ROUTINE_MENU, AppTab.LOVE_MENU, AppTab.LEISURE_MENU, AppTab.HOME].includes(activeTab);
+  const showBackButton = activeTab !== AppTab.HOME;
 
-  // Componente de Widget do Menu
+  // Componente de Widget Reutilizável
   const MenuWidget = ({ 
     onClick, 
     icon: Icon, 
@@ -49,7 +53,7 @@ const App: React.FC = () => {
   }) => (
     <button 
       onClick={onClick}
-      className={`${bgClass} p-5 rounded-[2rem] border border-transparent hover:border-black/5 text-left transition-all duration-300 active:scale-95 group shadow-sm`}
+      className={`${bgClass} p-5 rounded-[2rem] border border-transparent hover:border-black/5 text-left transition-all duration-300 active:scale-95 group shadow-sm w-full`}
     >
       <div className="flex justify-between items-start mb-3">
         <div className={`p-3 rounded-2xl bg-white ${colorClass} shadow-sm group-hover:scale-110 transition-transform`}>
@@ -71,10 +75,10 @@ const App: React.FC = () => {
         {/* Header / Profile Switcher */}
         <div className="pt-12 pb-4 px-6 flex justify-between items-center bg-white sticky top-0 z-40 border-b border-slate-50">
            <div className="flex items-center gap-2">
-              {isSubPage && (
+              {showBackButton && (
                 <button 
                   onClick={() => setActiveTab(getParentTab())}
-                  className="mr-1 p-2 -ml-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"
+                  className="mr-1 p-2 -ml-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors animate-in slide-in-from-left-2"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
@@ -97,34 +101,59 @@ const App: React.FC = () => {
         </div>
 
         {/* Main Content Area */}
-        <main className="flex-1 px-6 pt-4 pb-24 overflow-y-auto no-scrollbar">
+        <main className="flex-1 px-6 pt-4 pb-12 overflow-y-auto no-scrollbar">
           
-          {/* --- HOME TAB --- */}
+          {/* --- HOME DASHBOARD --- */}
           {activeTab === AppTab.HOME && (
-            <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
+            <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
+              
+              {/* 1. Destaque */}
               <Countdown currentUser={currentUser} />
               
+              {/* 2. Clima e Humor */}
               <div className="space-y-4">
                 <WeatherWidget />
                 <MoodWidget currentUser={currentUser} />
               </div>
 
-              {/* Atalhos Rápidos Home */}
+              {/* 3. MENU PRINCIPAL (Widgets de Navegação) */}
               <div>
-                 <h3 className="text-sm font-bold text-slate-800 mb-3 px-1">Acesso Rápido</h3>
-                 <div className="grid grid-cols-2 gap-3">
-                    <button onClick={() => setActiveTab(AppTab.HABITS)} className="bg-emerald-50 p-4 rounded-2xl text-left border border-emerald-100">
-                       <ListTodo className="w-5 h-5 text-emerald-600 mb-2" />
-                       <span className="font-bold text-emerald-900 text-sm">Meus Hábitos</span>
-                    </button>
-                    <button onClick={() => setActiveTab(AppTab.SLEEP)} className="bg-indigo-50 p-4 rounded-2xl text-left border border-indigo-100">
-                       <Moon className="w-5 h-5 text-indigo-600 mb-2" />
-                       <span className="font-bold text-indigo-900 text-sm">Meu Sono</span>
-                    </button>
+                 <h3 className="text-sm font-bold text-slate-800 mb-4 px-1 flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-slate-400" />
+                    Menu Principal
+                 </h3>
+                 <div className="grid grid-cols-1 gap-4">
+                    <MenuWidget 
+                      onClick={() => setActiveTab(AppTab.ROUTINE_MENU)}
+                      icon={Dumbbell}
+                      title="Rotina & Saúde"
+                      subtitle="Hábitos, Treino, Sono & Suplementos"
+                      bgClass="bg-emerald-50"
+                      colorClass="text-emerald-600"
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <MenuWidget 
+                        onClick={() => setActiveTab(AppTab.LOVE_MENU)}
+                        icon={Heart}
+                        title="Nós Dois"
+                        subtitle="Dates & Fotos"
+                        bgClass="bg-rose-50"
+                        colorClass="text-rose-500"
+                      />
+                      <MenuWidget 
+                        onClick={() => setActiveTab(AppTab.LEISURE_MENU)}
+                        icon={Sparkles}
+                        title="Lazer"
+                        subtitle="Séries & Fé"
+                        bgClass="bg-amber-50"
+                        colorClass="text-amber-600"
+                      />
+                    </div>
                  </div>
               </div>
 
-              <div className="mt-4 p-5 bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl text-white shadow-lg shadow-slate-200">
+              {/* Mensagem de Bom dia */}
+              <div className="p-5 bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl text-white shadow-lg shadow-slate-200">
                  <p className="font-medium text-lg mb-1">
                    {currentUser === 'amanda' ? 'Bom dia, Princesa!' : 'Bom dia, Guerreiro!'}
                  </p>
@@ -137,9 +166,9 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {/* --- ROUTINE HUB (Menu) --- */}
+          {/* --- HUB: ROTINA --- */}
           {activeTab === AppTab.ROUTINE_MENU && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
               <div className="px-1">
                 <h2 className="text-2xl font-bold text-slate-900">Hub de Rotina</h2>
                 <p className="text-slate-500 text-sm">Cuide do corpo e da mente.</p>
@@ -192,9 +221,9 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {/* --- LOVE HUB (Menu) --- */}
+          {/* --- HUB: NÓS (LOVE) --- */}
           {activeTab === AppTab.LOVE_MENU && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
               <div className="px-1">
                 <h2 className="text-2xl font-bold text-slate-900">Espaço Nós</h2>
                 <p className="text-slate-500 text-sm">Memórias e planos a dois.</p>
@@ -231,9 +260,9 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {/* --- LEISURE HUB (Menu) --- */}
+          {/* --- HUB: LAZER --- */}
           {activeTab === AppTab.LEISURE_MENU && (
-             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+             <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
               <div className="px-1">
                 <h2 className="text-2xl font-bold text-slate-900">Lazer & Alma</h2>
                 <p className="text-slate-500 text-sm">Para relaxar e agradecer.</p>
@@ -323,8 +352,6 @@ const App: React.FC = () => {
           )}
           
         </main>
-
-        <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
     </div>
   );
