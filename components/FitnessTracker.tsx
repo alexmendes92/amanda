@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Plus, Minus, Check, Lock, Camera, Utensils, Droplets, Trophy, Edit2, AlertCircle, Sparkles, Send, ThumbsUp, Heart } from 'lucide-react';
-import { PhotoPost, UserRole } from '../types';
+import { Plus, Minus, Check, Lock, Camera, Utensils, Droplets, Trophy, Edit2, AlertCircle, Sparkles, Send, ThumbsUp, Heart, ShoppingBag, Gift } from 'lucide-react';
+import { PhotoPost, Reward, UserRole } from '../types';
 
 interface FitnessTrackerProps {
   currentUser: UserRole;
@@ -31,6 +31,15 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
 
   const [shapePhotos, setShapePhotos] = useState<PhotoPost[]>([
     { id: 's1', url: 'https://picsum.photos/400/600?grayscale', caption: 'Evolução Costas', likes: 1, likedByPartner: true, createdAt: '1 semana atrás' }
+  ]);
+
+  // Gamification States
+  const [userPoints, setUserPoints] = useState(1250); // Initial points for demo
+  const [rewards, setRewards] = useState<Reward[]>([
+    { id: '1', title: 'Massagem nos Pés (15min)', cost: 300, icon: '🦶', redeemed: false },
+    { id: '2', title: 'Alex lava a louça hoje', cost: 500, icon: '🍽️', redeemed: false },
+    { id: '3', title: 'Jantar Romântico Surpresa', cost: 1000, icon: '🍷', redeemed: false },
+    { id: '4', title: 'Vale "Você tem Razão"', cost: 5000, icon: '👑', redeemed: false },
   ]);
 
   // Status do Relatório: 'idle' (não enviado), 'sent' (amanda enviou), 'approved' (alex validou)
@@ -86,12 +95,27 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
 
   const handleSendReport = () => {
     setReportStatus('sent');
-    // Here you would trigger an API call to notify Alex
+    // Simulate adding points for completing the day
+    if (score === 100) {
+       setUserPoints(prev => prev + 100);
+       alert("Dia Perfeito! +100 Love Coins adicionados!");
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleApproveReport = () => {
     setReportStatus('approved');
+  };
+
+  const handleRedeem = (rewardId: string, cost: number) => {
+    if (userPoints >= cost) {
+      if (confirm(`Trocar ${cost} moedas por esta recompensa?`)) {
+        setUserPoints(prev => prev - cost);
+        setRewards(prev => prev.map(r => r.id === rewardId ? { ...r, redeemed: true } : r));
+      }
+    } else {
+      alert("Moedas insuficientes! Treine mais, gatinha! 💪");
+    }
   };
 
   // Water reminder logic
@@ -177,6 +201,50 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
           )}
         </div>
       )}
+
+      {/* LOJA DE RECOMPENSAS (Novo Recurso) */}
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-bold text-rose-900 flex items-center gap-2">
+            <ShoppingBag className="w-5 h-5 text-rose-500" />
+            Loja de Mimos
+          </h3>
+          <span className="text-xs font-bold bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200 flex items-center gap-1">
+             <Sparkles className="w-3 h-3" />
+             {userPoints} Love Coins
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          {rewards.map(reward => (
+            <button
+              key={reward.id}
+              disabled={userPoints < reward.cost || reward.redeemed}
+              onClick={() => handleRedeem(reward.id, reward.cost)}
+              className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${
+                reward.redeemed 
+                  ? 'bg-gray-100 border-gray-200 opacity-70'
+                  : userPoints >= reward.cost 
+                    ? 'bg-rose-50 border-rose-200 hover:bg-rose-100 hover:scale-[1.02]' 
+                    : 'bg-white border-slate-100 opacity-50 cursor-not-allowed'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{reward.icon}</span>
+                <div className="text-left">
+                  <span className={`text-sm font-medium block ${reward.redeemed ? 'line-through text-slate-500' : 'text-slate-700'}`}>
+                    {reward.title}
+                  </span>
+                  {reward.redeemed && <span className="text-[10px] text-green-600 font-bold">Resgatado! Cobre o Alex!</span>}
+                </div>
+              </div>
+              <div className="flex flex-col items-end">
+                 <span className="text-xs font-bold text-amber-500">{reward.cost} 🪙</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* 🍑 Treino */}
       <div className={`bg-white rounded-3xl shadow-sm border transition-all ${workoutDone ? 'border-green-200 bg-green-50/30' : 'border-slate-100'}`}>

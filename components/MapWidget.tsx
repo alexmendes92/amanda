@@ -13,8 +13,9 @@ const MapWidget: React.FC<MapWidgetProps> = ({ lat, lng, label }) => {
   useEffect(() => {
     const initMap = async () => {
       const loader = new Loader({
-        // Uses process.env.API_KEY as per best practices, but falls back to the user provided key if missing
-        apiKey: process.env.API_KEY || 'AIzaSyDZk_tY0pjDrAOWH1-t4a6chhHIUh43icM',
+        // Explicitly use the key provided in firebaseConfig which usually supports Maps
+        // Removing process.env.API_KEY to avoid conflict with GenAI keys
+        apiKey: 'AIzaSyDeiFzYLw8Z4Bo_BebAnJ_eYO_OGyBLdQU',
         version: "weekly",
       });
 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Clock, Heart, CheckCircle2, Plus, CalendarHeart, Navigation, Car, Building2, ArrowRight } from 'lucide-react';
+import { Calendar, MapPin, Clock, Heart, CheckCircle2, Plus, CalendarHeart, Navigation, Car, Building2, ArrowRight, Wand2, Sparkles, Cloud, Sun, Moon, Armchair, PartyPopper, Utensils } from 'lucide-react';
 import { Loader } from "@googlemaps/js-api-loader";
 import Countdown from './Countdown';
 import WeatherWidget from './WeatherWidget';
 import MapWidget from './MapWidget';
+import { getDateSuggestion } from '../services/geminiService';
 
 declare var google: any;
 
@@ -30,6 +31,12 @@ const Dates: React.FC = () => {
   const [commute, setCommute] = useState({ distance: '...', duration: '...' });
   const [loadingCommute, setLoadingCommute] = useState(true);
   
+  // AI Date Planner State
+  const [selectedMood, setSelectedMood] = useState<string>('');
+  const [selectedWeather, setSelectedWeather] = useState<string>('Clima agradável');
+  const [dateSuggestion, setDateSuggestion] = useState<string>('');
+  const [loadingSuggestion, setLoadingSuggestion] = useState(false);
+
   const [bucketList, setBucketList] = useState([
     { id: 1, text: 'Jantar no Terraço Itália', done: false },
     { id: 2, text: 'Acampar em São Francisco Xavier', done: false },
@@ -59,7 +66,9 @@ const Dates: React.FC = () => {
   useEffect(() => {
     const calculateCommute = async () => {
       const loader = new Loader({
-        apiKey: process.env.API_KEY || 'AIzaSyDZk_tY0pjDrAOWH1-t4a6chhHIUh43icM',
+        // Explicitly use the key provided in firebaseConfig which usually supports Maps
+        // Removing process.env.API_KEY to avoid conflict with GenAI keys
+        apiKey: 'AIzaSyDeiFzYLw8Z4Bo_BebAnJ_eYO_OGyBLdQU',
         version: "weekly",
       });
 
@@ -96,6 +105,14 @@ const Dates: React.FC = () => {
 
     calculateCommute();
   }, []);
+
+  const handleGenerateDate = async () => {
+    if (!selectedMood) return;
+    setLoadingSuggestion(true);
+    const suggestion = await getDateSuggestion(selectedWeather, selectedMood);
+    setDateSuggestion(suggestion);
+    setLoadingSuggestion(false);
+  };
 
   const toggleBucketItem = (id: number) => {
     setBucketList(bucketList.map(item => 
@@ -161,7 +178,96 @@ const Dates: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. CARD DESLOCAMENTO MPSP */}
+      {/* 2. NOVO: PLANEJADOR DE DATES COM IA */}
+      <section>
+        <div className="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+           {/* Decor */}
+           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+           
+           <h2 className="text-lg font-bold flex items-center gap-2 mb-4 relative z-10">
+             <Wand2 className="w-5 h-5 text-yellow-300" />
+             Planejador Mágico de Dates
+           </h2>
+
+           <div className="space-y-4 relative z-10">
+             {/* Weather Selector */}
+             <div>
+               <p className="text-xs text-indigo-200 mb-2 font-medium">Como está o tempo?</p>
+               <div className="flex gap-2">
+                  {['Ensolarado', 'Chuvoso', 'Frio'].map(w => (
+                    <button 
+                      key={w}
+                      onClick={() => setSelectedWeather(w)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedWeather === w ? 'bg-white text-indigo-600' : 'bg-white/20 text-white hover:bg-white/30'}`}
+                    >
+                      {w === 'Ensolarado' && <Sun className="w-3 h-3 inline mr-1" />}
+                      {w === 'Chuvoso' && <Cloud className="w-3 h-3 inline mr-1" />}
+                      {w === 'Frio' && <Moon className="w-3 h-3 inline mr-1" />}
+                      {w}
+                    </button>
+                  ))}
+               </div>
+             </div>
+
+             {/* Mood Selector */}
+             <div>
+               <p className="text-xs text-indigo-200 mb-2 font-medium">Qual a vibe de hoje?</p>
+               <div className="grid grid-cols-2 gap-2">
+                 {[
+                   { id: 'relax', label: 'Relax / Preguiça', icon: <Armchair className="w-4 h-4" /> },
+                   { id: 'romantic', label: 'Romântico', icon: <Heart className="w-4 h-4" /> },
+                   { id: 'fun', label: 'Animado / Sair', icon: <PartyPopper className="w-4 h-4" /> },
+                   { id: 'food', label: 'Fome de algo bom', icon: <Utensils className="w-4 h-4" /> }
+                 ].map(m => (
+                   <button
+                     key={m.id}
+                     onClick={() => setSelectedMood(m.label)}
+                     className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
+                       selectedMood === m.label 
+                         ? 'bg-white text-indigo-600 border-white' 
+                         : 'bg-indigo-800/50 text-indigo-100 border-indigo-500/30 hover:bg-indigo-700'
+                     }`}
+                   >
+                     {m.icon} {m.label}
+                   </button>
+                 ))}
+               </div>
+             </div>
+
+             {/* Action & Result */}
+             {!dateSuggestion && (
+               <button 
+                 onClick={handleGenerateDate}
+                 disabled={!selectedMood || loadingSuggestion}
+                 className="w-full bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold py-3 rounded-xl shadow-lg mt-2 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+               >
+                 {loadingSuggestion ? (
+                   <div className="w-5 h-5 border-2 border-yellow-900 border-t-transparent rounded-full animate-spin"></div>
+                 ) : (
+                   <>
+                     <Sparkles className="w-4 h-4" />
+                     Sugerir o Date Perfeito
+                   </>
+                 )}
+               </button>
+             )}
+
+             {dateSuggestion && (
+               <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 mt-4 border border-white/20 animate-in fade-in slide-in-from-bottom-2">
+                 <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-bold text-yellow-300 text-sm">Sugestão do Oráculo:</h3>
+                    <button onClick={() => setDateSuggestion('')} className="text-xs text-indigo-200 hover:text-white underline">Tentar outro</button>
+                 </div>
+                 <p className="text-sm whitespace-pre-line leading-relaxed text-indigo-50">
+                   {dateSuggestion}
+                 </p>
+               </div>
+             )}
+           </div>
+        </div>
+      </section>
+
+      {/* 3. CARD DESLOCAMENTO MPSP */}
       <section>
         <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
            <Car className="w-6 h-6 text-slate-600" />
@@ -219,7 +325,7 @@ const Dates: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. LINHA DO TEMPO (Timeline) */}
+      {/* 4. LINHA DO TEMPO (Timeline) */}
       <section>
         <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
            <Heart className="w-6 h-6 text-rose-500" />
@@ -256,7 +362,7 @@ const Dates: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. POTE DOS SONHOS (Bucket List) */}
+      {/* 5. POTE DOS SONHOS (Bucket List) */}
       <section>
         <div className="flex justify-between items-center mb-4">
            <h2 className="text-xl font-bold text-slate-800">Pote dos Sonhos</h2>

@@ -8,8 +8,11 @@ import Gallery from './components/Gallery';
 import Countdown from './components/Countdown';
 import FitnessTracker from './components/FitnessTracker';
 import WeatherWidget from './components/WeatherWidget';
+import MoodWidget from './components/MoodWidget';
 import Dates from './components/Dates';
 import Fandom from './components/Fandom';
+import Supplements from './components/Supplements';
+import Playlist from './components/Playlist';
 import { UserCircle2 } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -45,8 +48,11 @@ const App: React.FC = () => {
             <div className="space-y-2 animate-in fade-in zoom-in-95 duration-500">
               <Countdown currentUser={currentUser} />
               
-              {/* Weather Widget Added Here */}
-              <WeatherWidget />
+              {/* Weather Widgets */}
+              <div className="space-y-6">
+                <WeatherWidget />
+                <MoodWidget currentUser={currentUser} />
+              </div>
 
               <div className="grid grid-cols-2 gap-4">
                  <button onClick={() => setActiveTab(AppTab.SLEEP)} className="p-4 bg-indigo-50 rounded-2xl text-left hover:bg-indigo-100 transition-colors">
@@ -59,12 +65,22 @@ const App: React.FC = () => {
                     <span className="font-bold text-rose-900 text-sm">Projeto Musa</span>
                     <p className="text-xs text-rose-600/70">Treino, Dieta & Shape</p>
                  </button>
-                 <button onClick={() => setActiveTab(AppTab.DATES)} className="p-4 bg-rose-500 rounded-2xl text-left hover:bg-rose-600 transition-colors text-white shadow-lg shadow-rose-200">
-                    <span className="block text-2xl mb-1">📅</span>
-                    <span className="font-bold text-white text-sm">Encontros</span>
-                    <p className="text-xs text-rose-100">Próximo Date & História</p>
+                 <button onClick={() => setActiveTab(AppTab.SUPPLEMENTS)} className="p-4 bg-teal-50 rounded-2xl text-left hover:bg-teal-100 transition-colors">
+                    <span className="block text-2xl mb-1">💊</span>
+                    <span className="font-bold text-teal-900 text-sm">Suplementos</span>
+                    <p className="text-xs text-teal-600/70">Rotina & Detalhes</p>
                  </button>
-                 <button onClick={() => setActiveTab(AppTab.DEVOTIONAL)} className="p-4 bg-amber-50 rounded-2xl text-left hover:bg-amber-100 transition-colors">
+                 <button onClick={() => setActiveTab(AppTab.PLAYLIST)} className="p-4 bg-slate-800 rounded-2xl text-left hover:bg-slate-700 transition-colors text-white shadow-lg">
+                    <span className="block text-2xl mb-1">🎸</span>
+                    <span className="font-bold text-white text-sm">Rádio Nossa</span>
+                    <p className="text-xs text-slate-300">Rock & Boyce Avenue</p>
+                 </button>
+                 <button onClick={() => setActiveTab(AppTab.DATES)} className="col-span-2 p-4 bg-rose-500 rounded-2xl text-left hover:bg-rose-600 transition-colors text-white shadow-lg shadow-rose-200">
+                    <span className="block text-2xl mb-1">📅</span>
+                    <span className="font-bold text-white text-sm">Encontros & História</span>
+                    <p className="text-xs text-rose-100">Próximo Date: Ilhabela</p>
+                 </button>
+                 <button onClick={() => setActiveTab(AppTab.DEVOTIONAL)} className="col-span-2 p-4 bg-amber-50 rounded-2xl text-left hover:bg-amber-100 transition-colors">
                       <span className="block text-2xl mb-1">🙏</span>
                       <span className="font-bold text-amber-900 text-sm">Devocional</span>
                       <p className="text-xs text-amber-600/70">Fé Compartilhada</p>
@@ -119,6 +135,18 @@ const App: React.FC = () => {
           {activeTab === AppTab.FITNESS && (
             <div className="animate-in slide-in-from-right duration-300">
               <FitnessTracker currentUser={currentUser} />
+            </div>
+          )}
+
+          {activeTab === AppTab.SUPPLEMENTS && (
+            <div className="animate-in slide-in-from-right duration-300">
+              <Supplements />
+            </div>
+          )}
+
+          {activeTab === AppTab.PLAYLIST && (
+            <div className="animate-in slide-in-from-right duration-300">
+              <Playlist currentUser={currentUser} />
             </div>
           )}
 

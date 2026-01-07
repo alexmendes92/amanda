@@ -1,10 +1,17 @@
 
 import React, { useState } from 'react';
-import { Wand2, Sparkles, Scroll, CloudRain, Heart, Moon, Sun, Ghost, Zap } from 'lucide-react';
+import { Wand2, Sparkles, Scroll, CloudRain, Heart, Moon, Sun, Ghost, Zap, HelpCircle, Check, X, Trophy, BookOpen } from 'lucide-react';
 import { UserRole } from '../types';
 
 interface FandomProps {
   currentUser: UserRole;
+}
+
+interface QuizQuestion {
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
 }
 
 const Fandom: React.FC<FandomProps> = ({ currentUser }) => {
@@ -41,6 +48,90 @@ const Fandom: React.FC<FandomProps> = ({ currentUser }) => {
     setTwilightQuote(random);
   };
 
+  // --- QUIZ LOGIC ---
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [quizScore, setQuizScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [isAnswered, setIsAnswered] = useState(false);
+
+  // Perguntas sobre Crepúsculo (Para o Alex responder)
+  const twilightQuestions: QuizQuestion[] = [
+    {
+      question: "Qual fruta aparece na capa do primeiro livro?",
+      options: ["Romã", "Maçã", "Pêra", "Morango"],
+      correct: 1,
+      explanation: "A maçã representa o fruto proibido!"
+    },
+    {
+      question: "Como a pele de Edward reage ao sol?",
+      options: ["Derrete", "Queima", "Brilha como diamante", "Fica invisível"],
+      correct: 2,
+      explanation: "This is the skin of a killer, Bella! ✨"
+    },
+    {
+      question: "Qual o apelido que Jacob dá para a filha de Bella?",
+      options: ["Nessie", "Bells", "Reny", "Monstrinha"],
+      correct: 0,
+      explanation: "Bella ficou furiosa porque é apelido do Monstro do Lago Ness."
+    }
+  ];
+
+  // Perguntas sobre Harry Potter (Para a Amanda responder)
+  const hpQuestions: QuizQuestion[] = [
+    {
+      question: "Qual é a casa de Hogwarts do Harry?",
+      options: ["Sonserina", "Lufa-Lufa", "Grifinória", "Corvinal"],
+      correct: 2,
+      explanation: "Onde habitam os corações indômitos!"
+    },
+    {
+      question: "Qual animal representa a lealdade no mundo bruxo?",
+      options: ["Coruja", "Texugo", "Fênix", "Sapo"],
+      correct: 1,
+      explanation: "O texugo é o símbolo da Lufa-Lufa, a casa mais leal."
+    },
+    {
+      question: "O que se diz para abrir o Mapa do Maroto?",
+      options: ["Abracadabra", "Por favor", "Juro solenemente não fazer nada de bom", "Abre-te Sésamo"],
+      correct: 2,
+      explanation: "Mischief Managed! 📜"
+    }
+  ];
+
+  // Seleciona as perguntas baseadas em QUEM vai responder (Oposto do tema atual)
+  // Se sou Alex, respondo sobre Twilight. Se sou Amanda, respondo sobre HP.
+  const currentQuestions = currentUser === 'alex' ? twilightQuestions : hpQuestions;
+  const currentQuestion = currentQuestions[quizIndex];
+
+  const handleAnswer = (index: number) => {
+    if (isAnswered) return;
+    setSelectedOption(index);
+    setIsAnswered(true);
+    
+    if (index === currentQuestion.correct) {
+      setQuizScore(prev => prev + 10);
+    }
+  };
+
+  const nextQuestion = () => {
+    if (quizIndex < currentQuestions.length - 1) {
+      setQuizIndex(prev => prev + 1);
+      setSelectedOption(null);
+      setIsAnswered(false);
+    } else {
+      setShowResult(true);
+    }
+  };
+
+  const resetQuiz = () => {
+    setQuizIndex(0);
+    setQuizScore(0);
+    setShowResult(false);
+    setSelectedOption(null);
+    setIsAnswered(false);
+  };
+
   // --- HARRY POTTER THEME (ALEX) ---
   if (currentUser === 'alex') {
     return (
@@ -61,6 +152,65 @@ const Fandom: React.FC<FandomProps> = ({ currentUser }) => {
           </div>
           <h2 className="text-3xl font-serif font-bold text-amber-500 tracking-wider">Hogwarts Legacy</h2>
           <p className="text-slate-400 text-sm mt-1 italic">"Juro solenemente não fazer nada de bom"</p>
+        </div>
+
+        {/* Quiz de Afinidade (Cross-Fandom) */}
+        <div className="bg-slate-800 border-2 border-slate-700 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+           <div className="flex items-center gap-2 mb-4 text-emerald-400">
+             <HelpCircle className="w-5 h-5" />
+             <h3 className="font-bold uppercase tracking-wider text-xs">Desafio do Universo Dela</h3>
+           </div>
+           
+           {!showResult ? (
+             <div>
+               <p className="text-lg font-medium text-slate-200 mb-4">{currentQuestion.question}</p>
+               <div className="space-y-2">
+                 {currentQuestion.options.map((option, idx) => (
+                   <button
+                     key={idx}
+                     onClick={() => handleAnswer(idx)}
+                     disabled={isAnswered}
+                     className={`w-full p-3 rounded-lg text-left transition-all text-sm font-medium ${
+                       isAnswered 
+                         ? idx === currentQuestion.correct 
+                            ? 'bg-emerald-900/50 border border-emerald-500 text-emerald-200'
+                            : idx === selectedOption 
+                              ? 'bg-red-900/50 border border-red-500 text-red-200'
+                              : 'bg-slate-700/30 text-slate-500'
+                         : 'bg-slate-700 hover:bg-slate-600 text-slate-200'
+                     }`}
+                   >
+                     <div className="flex justify-between items-center">
+                       {option}
+                       {isAnswered && idx === currentQuestion.correct && <Check className="w-4 h-4 text-emerald-400" />}
+                       {isAnswered && idx === selectedOption && idx !== currentQuestion.correct && <X className="w-4 h-4 text-red-400" />}
+                     </div>
+                   </button>
+                 ))}
+               </div>
+               
+               {isAnswered && (
+                 <div className="mt-4 animate-in fade-in slide-in-from-top-2">
+                   <p className="text-xs text-amber-200 italic mb-3">💡 {currentQuestion.explanation}</p>
+                   <button 
+                     onClick={nextQuestion}
+                     className="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-bold text-sm"
+                   >
+                     {quizIndex < currentQuestions.length - 1 ? 'Próxima Pergunta' : 'Ver Resultado'}
+                   </button>
+                 </div>
+               )}
+             </div>
+           ) : (
+             <div className="text-center py-4">
+               <Trophy className="w-12 h-12 text-yellow-400 mx-auto mb-3" />
+               <h3 className="text-xl font-bold text-white mb-1">Pontuação: {quizScore}</h3>
+               <p className="text-slate-400 text-sm mb-4">
+                 {quizScore === 30 ? "Você sabe tudo sobre o mundo dela! ❤️" : "Bom esforço! Ela vai te ensinar mais."}
+               </p>
+               <button onClick={resetQuiz} className="text-xs text-amber-500 hover:text-amber-400 underline">Jogar Novamente</button>
+             </div>
+           )}
         </div>
 
         {/* Spell Caster */}
@@ -94,20 +244,6 @@ const Fandom: React.FC<FandomProps> = ({ currentUser }) => {
              Onde habitam os corações indômitos. Ousadia, sangue-frio e nobreza destacam os alunos da Grifinória.
            </p>
         </div>
-
-        {/* Daily Prophet */}
-        <div className="bg-[#f0e6d2] text-slate-900 p-4 rounded-xl shadow-lg transform rotate-1 border-4 border-double border-slate-800">
-           <div className="flex justify-between items-center border-b-2 border-slate-900 pb-2 mb-2">
-              <span className="font-serif font-black uppercase tracking-tighter">O Profeta Diário</span>
-              <span className="text-xs font-bold">1 Galeão</span>
-           </div>
-           <div className="font-serif">
-              <h4 className="font-bold text-lg leading-tight mb-2">ALEX VENCE TORNEIO!</h4>
-              <p className="text-xs text-justify leading-snug opacity-90">
-                 Fontes confirmam que o bruxo Alex foi visto realizando feitos incríveis no mundo trouxa, conquistando o coração da bruxa Amanda com sua coragem e charme inegável.
-              </p>
-           </div>
-        </div>
       </div>
     );
   }
@@ -128,6 +264,65 @@ const Fandom: React.FC<FandomProps> = ({ currentUser }) => {
           <CloudRain className="w-3 h-3" />
           Forks, Washington
         </div>
+      </div>
+
+      {/* Quiz de Afinidade (Cross-Fandom) */}
+      <div className="relative z-10 bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/10">
+           <div className="flex items-center gap-2 mb-4 text-amber-200">
+             <BookOpen className="w-5 h-5" />
+             <h3 className="font-bold uppercase tracking-wider text-xs font-serif">N.O.M.s (Mundo Dele)</h3>
+           </div>
+           
+           {!showResult ? (
+             <div>
+               <p className="text-lg font-serif italic text-white/90 mb-4">{currentQuestion.question}</p>
+               <div className="space-y-2">
+                 {currentQuestion.options.map((option, idx) => (
+                   <button
+                     key={idx}
+                     onClick={() => handleAnswer(idx)}
+                     disabled={isAnswered}
+                     className={`w-full p-3 rounded-lg text-left transition-all text-sm font-medium ${
+                       isAnswered 
+                         ? idx === currentQuestion.correct 
+                            ? 'bg-emerald-900/70 border border-emerald-400 text-emerald-100'
+                            : idx === selectedOption 
+                              ? 'bg-red-900/70 border border-red-400 text-red-100'
+                              : 'bg-slate-900/30 text-slate-400'
+                         : 'bg-slate-900/40 hover:bg-slate-900/60 text-slate-200 border border-white/5'
+                     }`}
+                   >
+                     <div className="flex justify-between items-center">
+                       {option}
+                       {isAnswered && idx === currentQuestion.correct && <Check className="w-4 h-4 text-emerald-400" />}
+                       {isAnswered && idx === selectedOption && idx !== currentQuestion.correct && <X className="w-4 h-4 text-red-400" />}
+                     </div>
+                   </button>
+                 ))}
+               </div>
+               
+               {isAnswered && (
+                 <div className="mt-4 animate-in fade-in slide-in-from-top-2">
+                   <p className="text-xs text-emerald-200 font-serif italic mb-3">✨ {currentQuestion.explanation}</p>
+                   <button 
+                     onClick={nextQuestion}
+                     className="w-full py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg font-bold text-sm uppercase tracking-widest"
+                   >
+                     {quizIndex < currentQuestions.length - 1 ? 'Próxima' : 'Resultado'}
+                   </button>
+                 </div>
+               )}
+             </div>
+           ) : (
+             <div className="text-center py-4">
+               <Trophy className="w-12 h-12 text-amber-300 mx-auto mb-3" />
+               <h3 className="text-xl font-serif font-bold text-white mb-1">Pontuação: {quizScore}</h3>
+               <p className="text-slate-300 text-sm font-serif mb-4">
+                 {quizScore === 30 ? "10 pontos para a Amanda! 🧙‍♀️" : "Precisa maratonar os filmes com ele!"}
+               </p>
+               <button onClick={resetQuiz} className="text-xs text-emerald-400 hover:text-emerald-300 underline uppercase tracking-widest">Jogar Novamente</button>
+             </div>
+           )}
       </div>
 
       {/* Quote Card */}

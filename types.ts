@@ -39,6 +39,20 @@ export interface WeatherData {
   locationName: string;
 }
 
+export interface Reward {
+  id: string;
+  title: string;
+  cost: number;
+  icon: string;
+  redeemed: boolean;
+}
+
+export interface SongRecommendation {
+  title: string;
+  artist: string;
+  reason: string; // Por que a IA escolheu essa música
+}
+
 export enum AppTab {
   HOME = 'home',
   SLEEP = 'sleep',
@@ -47,4 +61,6 @@ export enum AppTab {
   FITNESS = 'fitness',
   DATES = 'dates',
   FANDOM = 'fandom',
+  SUPPLEMENTS = 'supplements',
+  PLAYLIST = 'playlist',
 }
