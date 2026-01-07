@@ -1,18 +1,38 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Loader } from "@googlemaps/js-api-loader";
-import { Search, MapPin, Navigation, Star } from 'lucide-react';
+import { Search, MapPin, Navigation, Star, Utensils, TreePine, PartyPopper, Camera, ArrowRight } from 'lucide-react';
 import { getExploreSuggestions } from '../services/geminiService';
 
 const ExploreMap: React.FC = () => {
   const [query, setQuery] = useState('');
   const [places, setPlaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [activePlaceIndex, setActivePlaceIndex] = useState<number | null>(null);
+  
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
 
-  // Inicializa o Mapa (Vazio ou com default)
+  // Ícones por categoria
+  const getCategoryIcon = (type: string) => {
+    switch (type) {
+      case 'food': return <Utensils className="w-3 h-3" />;
+      case 'nature': return <TreePine className="w-3 h-3" />;
+      case 'fun': return <PartyPopper className="w-3 h-3" />;
+      default: return <Camera className="w-3 h-3" />;
+    }
+  };
+
+  const getCategoryColor = (type: string) => {
+    switch (type) {
+      case 'food': return 'bg-orange-100 text-orange-600';
+      case 'nature': return 'bg-emerald-100 text-emerald-600';
+      case 'fun': return 'bg-purple-100 text-purple-600';
+      default: return 'bg-blue-100 text-blue-600';
+    }
+  };
+
   useEffect(() => {
     const initMap = async () => {
       const loader = new Loader({
@@ -21,17 +41,17 @@ const ExploreMap: React.FC = () => {
       });
 
       try {
-        const { Map } = await loader.importLibrary("maps") as any;
+        await (loader as any).load();
+        const Map = google.maps.Map;
         
         if (mapRef.current && !mapInstanceRef.current) {
           mapInstanceRef.current = new Map(mapRef.current, {
             center: { lat: -23.5505, lng: -46.6333 }, // Default SP
-            zoom: 10,
-            disableDefaultUI: true,
+            zoom: 12,
+            disableDefaultUI: true, // Clean look
             styles: [
               {
                 featureType: "poi",
-                elementType: "labels",
                 stylers: [{ visibility: "off" }],
               },
             ],
@@ -51,24 +71,25 @@ const ExploreMap: React.FC = () => {
 
     setLoading(true);
     setPlaces([]);
+    setActivePlaceIndex(null);
     
     // Limpar markers antigos
     markersRef.current.forEach((marker: any) => marker.setMap(null));
     markersRef.current = [];
 
-    // 1. Buscar sugestões na IA
     const suggestions = await getExploreSuggestions(query);
     setPlaces(suggestions);
     setLoading(false);
 
-    // 2. Plotar no Mapa
     if (mapInstanceRef.current && suggestions.length > 0) {
       const loader = new Loader({
         apiKey: 'AIzaSyDZk_tY0pjDrAOWH1-t4a6chhHIUh43icM', 
         version: "weekly",
       });
-      const { Marker } = await loader.importLibrary("marker") as any;
-      const { LatLngBounds } = await loader.importLibrary("core") as any;
+      
+      await (loader as any).load();
+      const Marker = google.maps.Marker;
+      const LatLngBounds = google.maps.LatLngBounds;
 
       const bounds = new LatLngBounds();
 
@@ -80,10 +101,17 @@ const ExploreMap: React.FC = () => {
           label: {
              text: (index + 1).toString(),
              color: "white",
-             fontSize: "12px",
+             fontSize: "14px",
              fontWeight: "bold"
           },
           animation: (window as any).google.maps.Animation.DROP
+        });
+        
+        // Adicionar listener de clique no marker
+        marker.addListener("click", () => {
+          setActivePlaceIndex(index);
+          mapInstanceRef.current.panTo({ lat: place.lat, lng: place.lng });
+          mapInstanceRef.current.setZoom(15);
         });
         
         markersRef.current.push(marker);
@@ -94,62 +122,127 @@ const ExploreMap: React.FC = () => {
     }
   };
 
+  const focusOnPlace = (index: number) => {
+    setActivePlaceIndex(index);
+    const place = places[index];
+    if (mapInstanceRef.current && place) {
+      mapInstanceRef.current.panTo({ lat: place.lat, lng: place.lng });
+      mapInstanceRef.current.setZoom(15);
+      
+      // Animate marker bounce
+      const marker = markersRef.current[index];
+      if (marker) {
+        marker.setAnimation((window as any).google.maps.Animation.BOUNCE);
+        setTimeout(() => marker.setAnimation(null), 1400);
+      }
+    }
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
-        <h3 className="font-bold text-slate-800 mb-3 flex items-center gap-2">
-          <Navigation className="w-5 h-5 text-indigo-500" />
-          Mapa de Aventuras
-        </h3>
-        <p className="text-xs text-slate-500 mb-4">Digite uma cidade e veja o que fazer!</p>
-        
-        <form onSubmit={handleSearch} className="relative mb-4">
-          <input 
-            type="text" 
+    <div className="relative w-full overflow-hidden rounded-[2rem] shadow-xl bg-slate-50 border border-slate-100 h-[500px]">
+      
+      {/* 1. MAPA (Fundo) */}
+      <div className="absolute inset-0 z-0">
+         <div ref={mapRef} className="w-full h-full" />
+      </div>
+
+      {/* 2. SEARCH BAR FLUTUANTE (Topo) */}
+      <div className="absolute top-4 left-4 right-4 z-10">
+        <form onSubmit={handleSearch} className="relative shadow-lg rounded-2xl">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-slate-400" />
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-10 pr-12 py-3.5 bg-white/95 backdrop-blur-md border-none text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-2xl text-sm font-medium shadow-sm"
+            placeholder="Para onde vamos, amor?"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ex: Campos do Jordão, Monte Verde..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
-          <button 
+          <button
             type="submit"
             disabled={loading}
-            className="absolute right-2 top-2 bg-indigo-600 text-white p-1.5 rounded-lg text-xs font-bold disabled:opacity-50"
+            className="absolute inset-y-1 right-1 flex items-center justify-center px-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-md"
           >
-            {loading ? '...' : 'Ir'}
+            {loading ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <ArrowRight className="w-4 h-4" />
+            )}
           </button>
         </form>
+      </div>
 
-        <div className="relative w-full h-64 rounded-2xl overflow-hidden bg-slate-100 mb-4 shadow-inner">
-           <div ref={mapRef} className="w-full h-full" />
-           {loading && (
-             <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10">
-               <div className="flex flex-col items-center">
-                 <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-                 <span className="text-xs font-bold text-indigo-600">Consultando o Guia...</span>
-               </div>
-             </div>
-           )}
+      {/* 3. LOADING OVERLAY */}
+      {loading && (
+        <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center animate-in fade-in">
+          <div className="bg-white p-4 rounded-full shadow-2xl mb-3">
+             <Navigation className="w-8 h-8 text-indigo-600 animate-spin" />
+          </div>
+          <p className="text-sm font-bold text-slate-600 bg-white/80 px-3 py-1 rounded-full">Procurando lugares mágicos...</p>
         </div>
+      )}
 
-        {places.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Sugestões</p>
+      {/* 4. CARDS DE SUGESTÃO (Carrossel Inferior) */}
+      {places.length > 0 && !loading && (
+        <div className="absolute bottom-6 left-0 right-0 z-10">
+          <div className="flex overflow-x-auto gap-3 px-4 pb-2 no-scrollbar snap-x snap-mandatory">
             {places.map((place, idx) => (
-              <div key={idx} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+              <button
+                key={idx}
+                onClick={() => focusOnPlace(idx)}
+                className={`snap-center flex-shrink-0 w-[240px] bg-white p-3 rounded-2xl shadow-lg border transition-all duration-300 text-left relative overflow-hidden group ${
+                  activePlaceIndex === idx 
+                    ? 'border-indigo-500 ring-2 ring-indigo-500/20 scale-100' 
+                    : 'border-white/50 opacity-90 scale-95'
+                }`}
+              >
+                {/* Badge Number */}
+                <div className="absolute top-2 right-2 w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs font-bold z-10">
                   {idx + 1}
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-800">{place.name}</h4>
-                  <p className="text-xs text-slate-500 leading-tight">{place.description}</p>
+
+                <div className="flex flex-col h-full justify-between">
+                  <div>
+                    <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide mb-2 ${getCategoryColor(place.type)}`}>
+                      {getCategoryIcon(place.type)}
+                      {place.type || 'Geral'}
+                    </div>
+                    <h4 className="font-bold text-slate-800 text-sm leading-tight mb-1 line-clamp-2">
+                      {place.name}
+                    </h4>
+                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                      {place.description}
+                    </p>
+                  </div>
+                  
+                  <div className="mt-3 flex items-center gap-1 text-[10px] font-medium text-indigo-600">
+                     <MapPin className="w-3 h-3" />
+                     Ver no mapa
+                  </div>
                 </div>
-              </div>
+              </button>
             ))}
+            {/* Spacer para garantir que o último item seja visível */}
+            <div className="w-2 flex-shrink-0"></div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+      
+      {/* Estado vazio bonito */}
+      {places.length === 0 && !loading && (
+         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-white via-white/80 to-transparent flex flex-col justify-end p-6 pointer-events-none">
+            <div className="flex items-center gap-3 opacity-60 mb-2">
+               <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center"><Utensils className="w-4 h-4 text-orange-500" /></div>
+               <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center"><TreePine className="w-4 h-4 text-emerald-500" /></div>
+               <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center"><PartyPopper className="w-4 h-4 text-purple-500" /></div>
+            </div>
+            <p className="text-slate-500 text-xs font-medium max-w-[200px]">
+              Digite uma cidade (ex: "Campos do Jordão") e descubra roteiros perfeitos para casais.
+            </p>
+         </div>
+      )}
+
     </div>
   );
 };

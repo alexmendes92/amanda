@@ -19,8 +19,11 @@ const MapWidget: React.FC<MapWidgetProps> = ({ lat, lng, label }) => {
       });
 
       try {
-        const { Map } = await loader.importLibrary("maps") as any;
-        const { Marker } = await loader.importLibrary("marker") as any;
+        await (loader as any).load();
+        
+        // Access types via global google.maps namespace
+        const Map = google.maps.Map;
+        const Marker = google.maps.Marker;
 
         if (mapRef.current) {
           const map = new Map(mapRef.current, {
