@@ -32,39 +32,13 @@ export interface StudyStatus {
   lastUpdated: string;
 }
 
-// --- WEATHER TYPES ATUALIZADOS ---
-export interface WeatherHour {
-  time: string; // "14:00"
+export interface WeatherData {
   temp: number;
-  conditionCode: number;
+  conditionCode: number; // WMO code
   isDay: boolean;
-}
-
-export interface WeatherDay {
-  date: string; // "Seg"
-  max: number;
-  min: number;
-  conditionCode: number;
-  rainProb: number;
-}
-
-export interface DetailedWeather {
-  current: {
-    temp: number;
-    conditionCode: number;
-    isDay: boolean;
-    humidity: number;
-    windSpeed: number;
-    uvIndex: number;
-    feelsLike: number;
-  };
-  hourly: WeatherHour[];
-  daily: WeatherDay[];
   locationName: string;
-  sunrise: string;
-  sunset: string;
+  uvIndex?: number; // Novo
 }
-// --------------------------------
 
 export interface Reward {
   id: string;
@@ -77,7 +51,33 @@ export interface Reward {
 export interface SongRecommendation {
   title: string;
   artist: string;
-  reason: string; // Por que a IA escolheu essa música
+  reason: string;
+}
+
+// Novos Tipos
+export interface Transaction {
+  id: string;
+  title: string;
+  amount: number;
+  type: 'deposit' | 'withdraw';
+  date: string;
+}
+
+export interface Movie {
+  id: string;
+  title: string;
+  genre: string;
+  platform: string;
+  watched: boolean;
+  rating?: number;
+}
+
+export interface Coupon {
+  id: string;
+  title: string;
+  description: string;
+  emoji: string;
+  quantity: number;
 }
 
 export enum AppTab {
@@ -88,7 +88,7 @@ export enum AppTab {
   LOVE_MENU = 'love_menu',
   LEISURE_MENU = 'leisure_menu',
 
-  // Tools
+  // Tools Existing
   SLEEP = 'sleep',
   DEVOTIONAL = 'devotional',
   GALLERY = 'gallery',
@@ -99,5 +99,16 @@ export enum AppTab {
   PLAYLIST = 'playlist',
   HABITS = 'habits',
   INSIGHTS = 'insights',
-  YOU_ARE_RIGHT = 'you_are_right', 
+  YOU_ARE_RIGHT = 'you_are_right',
+
+  // New Tools
+  FINANCE = 'finance',
+  CINEMA = 'cinema',
+  LOVE_BANK = 'love_bank',
+  CYCLE = 'cycle',
+  MARKET = 'market',
+  SOS = 'sos',
+  CAPSULE = 'capsule',
+  QUIZ = 'quiz',
+  AI_COACH = 'ai_coach',
 }

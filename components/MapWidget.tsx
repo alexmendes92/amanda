@@ -20,10 +20,7 @@ const MapWidget: React.FC<MapWidgetProps> = ({ lat, lng, label }) => {
 
       try {
         await (loader as any).load();
-        
-        // Access types via global google.maps namespace
-        const Map = google.maps.Map;
-        const Marker = google.maps.Marker;
+        const { Map, Marker } = (window as any).google.maps;
 
         if (mapRef.current) {
           const map = new Map(mapRef.current, {

@@ -1,8 +1,0 @@
-{
-  "name": "nosso-mundo-amanda-alex",
-  "compatibility_date": "2024-04-01",
-  "assets": {
-    "directory": "./dist"
-  },
-  "main": "index.ts" 
-}
