@@ -32,12 +32,39 @@ export interface StudyStatus {
   lastUpdated: string;
 }
 
-export interface WeatherData {
+// --- WEATHER TYPES ATUALIZADOS ---
+export interface WeatherHour {
+  time: string; // "14:00"
   temp: number;
-  conditionCode: number; // WMO code
+  conditionCode: number;
   isDay: boolean;
-  locationName: string;
 }
+
+export interface WeatherDay {
+  date: string; // "Seg"
+  max: number;
+  min: number;
+  conditionCode: number;
+  rainProb: number;
+}
+
+export interface DetailedWeather {
+  current: {
+    temp: number;
+    conditionCode: number;
+    isDay: boolean;
+    humidity: number;
+    windSpeed: number;
+    uvIndex: number;
+    feelsLike: number;
+  };
+  hourly: WeatherHour[];
+  daily: WeatherDay[];
+  locationName: string;
+  sunrise: string;
+  sunset: string;
+}
+// --------------------------------
 
 export interface Reward {
   id: string;
@@ -72,5 +99,5 @@ export enum AppTab {
   PLAYLIST = 'playlist',
   HABITS = 'habits',
   INSIGHTS = 'insights',
-  YOU_ARE_RIGHT = 'you_are_right', // Nova funcionalidade
+  YOU_ARE_RIGHT = 'you_are_right', 
 }

@@ -16,22 +16,21 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
   // --- Amanda States (Musa Fitness) ---
   const [peachClicked, setPeachClicked] = useState(false);
   const [peachMessage, setPeachMessage] = useState("Bumbum na nuca vindo aí! 🔥");
-  const [isEditingPeach, setIsEditingPeach] = useState(false);
   const [meals, setMeals] = useState({ cafe: true, almoco: true, lanche: false, jantar: false });
   const [amandaWorkoutDone, setAmandaWorkoutDone] = useState(false);
 
   // --- Alex States (Projeto Shape) ---
-  const [alexWorkoutType, setAlexWorkoutType] = useState<string | null>(null); // 'push', 'pull', 'legs', 'cardio'
+  const [alexWorkoutType, setAlexWorkoutType] = useState<string | null>(null);
   const [proteinIntake, setProteinIntake] = useState(0);
-  const proteinGoal = 160; // gramas
+  const proteinGoal = 160;
   
   // --- Shared Data ---
   const [supplements, setSupplements] = useState([
     { id: 'creatina', name: 'Creatina', icon: '⚡', subtitle: 'Todo dia sem falhar', taken: false },
-    { id: 'whey', name: 'Whey Protein', icon: '🥛', subtitle: 'Pós-treino', taken: false },
+    { id: 'whey', name: 'Whey', icon: '🥛', subtitle: 'Pós-treino', taken: false },
     { id: 'omega3', name: 'Ômega 3', icon: '🐟', subtitle: 'Almoço', taken: false },
-    { id: 'multi', name: 'Multivitamínico', icon: '💊', subtitle: 'Pela manhã', taken: false },
-    { id: 'colageno', name: 'Colágeno', icon: '✨', subtitle: 'Antes de dormir', taken: false }, // Amanda focused but ok for both
+    { id: 'multi', name: 'Multi', icon: '💊', subtitle: 'Manhã', taken: false },
+    { id: 'colageno', name: 'Colágeno', icon: '✨', subtitle: 'Noite', taken: false },
   ]);
 
   const [shapePhotos, setShapePhotos] = useState<PhotoPost[]>([
@@ -39,23 +38,17 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
   ]);
 
   const [rewards, setRewards] = useState<Reward[]>([
-    { id: '1', title: 'Massagem nos Pés (15min)', cost: 300, icon: '🦶', redeemed: false },
-    { id: '2', title: 'Alex lava a louça hoje', cost: 500, icon: '🍽️', redeemed: false },
-    { id: '3', title: 'Jantar Romântico Surpresa', cost: 1000, icon: '🍷', redeemed: false },
+    { id: '1', title: 'Massagem Pés (15min)', cost: 300, icon: '🦶', redeemed: false },
+    { id: '2', title: 'Alex lava a louça', cost: 500, icon: '🍽️', redeemed: false },
+    { id: '3', title: 'Jantar Surpresa', cost: 1000, icon: '🍷', redeemed: false },
     { id: '4', title: 'Vale "Você tem Razão"', cost: 5000, icon: '👑', redeemed: false },
   ]);
 
-  // --- Calculations ---
-  // Water
-  const waterGoal = 8;
-  const showWaterReminder = new Date().getHours() >= 13 && waterCount === 0;
-
-  // Score Logic
-  const countSupplements = supplements.filter(s => s.taken).length;
-  
+  // Calculations
   let score = 0;
   if (currentUser === 'amanda') {
      const countMeals = Object.values(meals).filter(Boolean).length;
+     const countSupplements = supplements.filter(s => s.taken).length;
      score = Math.round(
       ((amandaWorkoutDone ? 1 : 0) * 30) +
       ((countMeals / 4) * 30) +
@@ -63,7 +56,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
       ((countSupplements / supplements.length) * 20)
     );
   } else {
-     // Alex Score Logic
+     const countSupplements = supplements.filter(s => s.taken).length;
      const proteinScore = Math.min(proteinIntake / proteinGoal, 1) * 30;
      const workoutScore = alexWorkoutType ? 30 : 0;
      const waterScore = (Math.min(waterCount, 8) / 8) * 20;
@@ -71,7 +64,7 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
      score = Math.round(proteinScore + workoutScore + waterScore + suppScore);
   }
 
-  // --- Handlers ---
+  // Handlers
   const handlePeachClick = () => {
     setPeachClicked(true);
     setTimeout(() => setPeachClicked(false), 3000);
@@ -103,14 +96,14 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
     setReportStatus('sent');
     if (score === 100) {
        setUserPoints(prev => prev + 100);
-       alert("Dia Perfeito! +100 Love Coins adicionados!");
+       alert("Dia Perfeito! +100 Love Coins!");
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleRedeem = (rewardId: string, cost: number) => {
     if (userPoints >= cost) {
-      if (confirm(`Trocar ${cost} moedas por esta recompensa?`)) {
+      if (confirm(`Trocar ${cost} moedas?`)) {
         setUserPoints(prev => prev - cost);
         setRewards(prev => prev.map(r => r.id === rewardId ? { ...r, redeemed: true } : r));
       }
@@ -119,128 +112,126 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
     }
   };
 
-  // --- RENDERERS ---
-
-  // 1. AMANDA'S VIEW (Musa Fitness)
+  // 1. AMANDA'S VIEW
   if (currentUser === 'amanda') {
     return (
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="bg-rose-50 p-6 rounded-2xl border border-rose-100 text-center relative">
-           <div className="absolute top-0 left-0 h-1 bg-rose-200 w-full rounded-t-2xl overflow-hidden">
+      <div className="space-y-6">
+        {/* Header Compacto */}
+        <div className="bg-rose-50 p-4 rounded-3xl border border-rose-100 text-center relative overflow-hidden">
+           <div className="absolute top-0 left-0 h-1.5 bg-rose-200 w-full">
               <div className="h-full bg-rose-500 transition-all duration-1000" style={{ width: `${score}%` }}></div>
            </div>
-           <h2 className="text-2xl font-bold text-rose-900 flex justify-center items-center gap-2 mt-2">
+           <h2 className="text-xl font-bold text-rose-900 flex justify-center items-center gap-2 mt-2">
             Projeto Musa
           </h2>
           <p className="text-rose-600 text-xs font-medium mt-1">
-            {score}% concluído hoje. Vamos buscar o 100%!
+            {score}% concluído. Vamos lá!
           </p>
         </div>
 
         {/* 🍑 Treino Peach */}
-        <div className={`bg-white rounded-3xl shadow-sm border transition-all ${amandaWorkoutDone ? 'border-green-200 bg-green-50/30' : 'border-slate-100'}`}>
-          <div className="p-6 text-center">
-            <div className="flex justify-between items-start mb-2">
-               <h3 className="font-bold text-slate-800">Treino do Dia</h3>
-               <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm">
-                  <span className="text-xs font-bold text-slate-600">Já treinou?</span>
+        <div className={`bg-white rounded-[1.5rem] shadow-sm border transition-all ${amandaWorkoutDone ? 'border-green-200 bg-green-50/30' : 'border-slate-100'}`}>
+          <div className="p-5 text-center">
+            <div className="flex justify-between items-center mb-4">
+               <h3 className="font-bold text-slate-800 text-sm">Treino do Dia</h3>
+               <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm active:scale-95 transition-transform">
+                  <span className="text-[10px] font-bold text-slate-600 uppercase">Marcar Feito</span>
                   <input 
                     type="checkbox" 
                     checked={amandaWorkoutDone} 
                     onChange={(e) => setAmandaWorkoutDone(e.target.checked)}
-                    className="w-5 h-5 accent-green-500 rounded cursor-pointer"
+                    className="w-4 h-4 accent-green-500 rounded cursor-pointer"
                   />
                </label>
             </div>
             
-            <div className="relative overflow-hidden py-4">
+            <div className="relative overflow-hidden py-2">
               <button
                 onClick={handlePeachClick}
-                className={`group relative inline-flex items-center justify-center w-24 h-24 rounded-full transition-all duration-300 ${
+                className={`group relative inline-flex items-center justify-center w-20 h-20 rounded-full transition-all duration-300 ${
                   peachClicked 
-                    ? 'bg-orange-100 scale-110 shadow-[0_0_30px_rgba(251,146,60,0.6)]' 
+                    ? 'bg-orange-100 scale-110 shadow-[0_0_20px_rgba(251,146,60,0.5)]' 
                     : 'bg-slate-50 hover:bg-orange-50'
                 }`}
               >
-                <span className={`text-5xl transition-transform duration-500 ${peachClicked ? 'animate-bounce' : 'grayscale group-hover:grayscale-0'}`}>
+                <span className={`text-4xl transition-transform duration-500 ${peachClicked ? 'animate-bounce' : 'grayscale group-hover:grayscale-0'}`}>
                   🍑
                 </span>
               </button>
-              <div className={`mt-4 transition-all duration-500 ${peachClicked ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                <p className="text-orange-600 font-bold text-lg">"{peachMessage}"</p>
+              <div className={`mt-3 h-6 transition-all duration-500 ${peachClicked ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                <p className="text-orange-600 font-bold text-xs">"{peachMessage}"</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Meals & Water & Supps (Simplified reuse for Amanda) */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-           <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-             <Utensils className="w-5 h-5 text-green-500" /> Alimentação
+        {/* Card Unificado: Alimentação + Hidratação */}
+        <div className="bg-white rounded-[1.5rem] p-5 shadow-sm border border-slate-100">
+           <h3 className="font-bold text-slate-800 mb-3 flex items-center gap-2 text-sm">
+             <Utensils className="w-4 h-4 text-green-500" /> Alimentação
            </h3>
-           <div className="grid grid-cols-2 gap-3 mb-8">
+           <div className="grid grid-cols-2 gap-2 mb-6">
              {Object.entries(meals).map(([key, val]) => (
-               <button key={key} onClick={() => toggleMeal(key as any)} className={`p-3 rounded-xl border text-sm font-medium transition-all ${val ? 'bg-green-50 border-green-200 text-green-700' : 'bg-white text-slate-400 hover:bg-slate-50'}`}>
+               <button key={key} onClick={() => toggleMeal(key as any)} className={`py-2 px-1 rounded-xl border text-xs font-bold transition-all active:scale-95 ${val ? 'bg-green-50 border-green-200 text-green-700' : 'bg-white text-slate-400 border-slate-100'}`}>
                  {key.charAt(0).toUpperCase() + key.slice(1)} {val && '✅'}
                </button>
              ))}
            </div>
            
-           {/* REDESIGNED HYDRATION WIDGET */}
-           <div className="bg-blue-50/50 rounded-2xl p-5 border border-blue-100">
-             <div className="flex justify-between items-center mb-4">
-               <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                 <Droplets className="w-5 h-5 text-blue-500" /> Hidratação
+           {/* REDESIGNED HYDRATION WIDGET (Compact) */}
+           <div className="bg-blue-50/50 rounded-xl p-4 border border-blue-100">
+             <div className="flex justify-between items-center mb-3">
+               <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                 <Droplets className="w-4 h-4 text-blue-500" /> Hidratação
                </h3>
-               <span className="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded-md">{waterCount}/8</span>
+               <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-md">{waterCount}/8</span>
              </div>
              
              {/* Visual Progress Bar (Cups) */}
-             <div className="flex justify-between gap-1.5 mb-5 px-1">
+             <div className="flex justify-between gap-1 mb-4 px-0.5">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div 
                     key={i} 
-                    className={`h-8 w-full rounded-md transition-all duration-300 ${
+                    className={`h-6 w-full rounded transition-all duration-300 ${
                       i < waterCount 
-                        ? 'bg-blue-400 scale-105 shadow-sm shadow-blue-200' 
+                        ? 'bg-blue-400 shadow-sm shadow-blue-200' 
                         : 'bg-blue-100/50'
                     }`}
                   ></div>
                 ))}
              </div>
 
-             <div className="flex items-center justify-between gap-4">
+             <div className="flex items-center justify-between gap-3">
                 <button 
                   onClick={() => setWaterCount(Math.max(0, waterCount - 1))} 
-                  className="w-12 h-12 bg-white text-blue-300 rounded-xl border border-blue-100 flex items-center justify-center hover:bg-blue-50 active:scale-95 transition-all shadow-sm"
+                  className="w-10 h-10 bg-white text-blue-300 rounded-xl border border-blue-100 flex items-center justify-center active:scale-90 transition-all shadow-sm"
                 >
-                  <Minus className="w-5 h-5" />
+                  <Minus className="w-4 h-4" />
                 </button>
                 
                 <div className="flex-1 text-center">
-                   <p className="text-3xl font-black text-blue-500 tracking-tight">{waterCount * 250}</p>
-                   <p className="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Mililitros</p>
+                   <p className="text-2xl font-black text-blue-500 tracking-tight leading-none">{waterCount * 250}</p>
+                   <p className="text-[9px] text-blue-400 font-bold uppercase tracking-wider">ml</p>
                 </div>
 
                 <button 
                   onClick={() => setWaterCount(Math.min(8, waterCount + 1))} 
-                  className="w-12 h-12 bg-blue-500 text-white rounded-xl shadow-lg shadow-blue-200 flex items-center justify-center hover:bg-blue-600 active:scale-95 transition-all"
+                  className="w-10 h-10 bg-blue-500 text-white rounded-xl shadow-lg shadow-blue-200 flex items-center justify-center active:scale-90 transition-all"
                 >
-                  <Plus className="w-6 h-6" />
+                  <Plus className="w-5 h-5" />
                 </button>
              </div>
            </div>
         </div>
 
         {/* Action Button */}
-        <div className="pt-4">
+        <div className="pt-2 pb-4">
           {reportStatus === 'sent' ? (
-             <div className="bg-green-600 text-white p-4 rounded-2xl shadow-xl flex items-center justify-center gap-2"><Check /> Relatório Enviado!</div>
+             <div className="bg-green-600 text-white p-4 rounded-2xl shadow-xl flex items-center justify-center gap-2 font-bold text-sm"><Check /> Relatório Enviado!</div>
           ) : (
-            <button onClick={handleSendReport} className="w-full bg-slate-900 text-white p-4 rounded-2xl shadow-xl flex items-center justify-between hover:bg-slate-800 transition-colors">
-              <div><p className="text-xs text-slate-400">Finalizar Dia</p><p className="font-bold">Prestar Contas 📝</p></div>
-              <Send className="w-6 h-6 text-rose-300" />
+            <button onClick={handleSendReport} className="w-full bg-slate-900 text-white p-4 rounded-2xl shadow-xl flex items-center justify-between hover:bg-slate-800 transition-colors active:scale-95">
+              <div className="text-left"><p className="text-[10px] text-slate-400 uppercase">Finalizar Dia</p><p className="font-bold text-sm">Prestar Contas 📝</p></div>
+              <Send className="w-5 h-5 text-rose-300" />
             </button>
           )}
         </div>
@@ -253,77 +244,77 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
     <div className="space-y-6">
       
       {/* Alex Header */}
-      <div className="bg-slate-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-10">
-           <Dumbbell className="w-32 h-32" />
+           <Dumbbell className="w-24 h-24" />
         </div>
         <div className="relative z-10">
-           <div className="flex justify-between items-start mb-4">
+           <div className="flex justify-between items-start mb-3">
               <div>
-                <h2 className="text-2xl font-bold italic">PROJETO SHAPE</h2>
-                <p className="text-slate-400 text-xs uppercase tracking-widest">Em busca do monstro</p>
+                <h2 className="text-xl font-bold italic">PROJETO SHAPE</h2>
+                <p className="text-slate-400 text-[10px] uppercase tracking-widest">Em busca do monstro</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">
-                <span className="font-bold text-emerald-400">{score}%</span>
+              <div className="bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-lg border border-white/10">
+                <span className="font-bold text-emerald-400 text-sm">{score}%</span>
               </div>
            </div>
            
            {/* Progress Bar */}
-           <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+           <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-blue-600 to-emerald-500" style={{ width: `${score}%` }}></div>
            </div>
         </div>
       </div>
 
       {/* 1. SELETOR DE TREINO */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-         <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2">
-              <Dumbbell className="w-5 h-5 text-indigo-600" />
+      <div className="bg-white rounded-[1.5rem] p-5 shadow-sm border border-slate-100">
+         <div className="flex justify-between items-center mb-3">
+            <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm">
+              <Dumbbell className="w-4 h-4 text-indigo-600" />
               Treino do Dia
             </h3>
-            {alexWorkoutType && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">Pago ✅</span>}
+            {alexWorkoutType && <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold uppercase">Pago ✅</span>}
          </div>
 
-         <div className="grid grid-cols-2 gap-3">
+         <div className="grid grid-cols-2 gap-2">
             {[
-              { id: 'push', label: 'Push (Empurrar)', sub: 'Peito / Ombro / Tríceps' },
-              { id: 'pull', label: 'Pull (Puxar)', sub: 'Costas / Bíceps' },
-              { id: 'legs', label: 'Legs (Pernas)', sub: 'Quadríceps / Posterior' },
-              { id: 'cardio', label: 'Cardio / ABS', sub: 'Corrida / Abdominais' }
+              { id: 'push', label: 'Push', sub: 'Peito/Ombro/Tri' },
+              { id: 'pull', label: 'Pull', sub: 'Costas/Bíceps' },
+              { id: 'legs', label: 'Legs', sub: 'Pernas Completas' },
+              { id: 'cardio', label: 'Cardio', sub: 'Corrida/Abs' }
             ].map((workout) => (
               <button
                 key={workout.id}
                 onClick={() => setAlexWorkoutType(alexWorkoutType === workout.id ? null : workout.id)}
-                className={`p-4 rounded-xl text-left border-2 transition-all ${
+                className={`p-3 rounded-xl text-left border transition-all active:scale-95 ${
                   alexWorkoutType === workout.id 
-                    ? 'bg-slate-800 border-slate-800 text-white shadow-lg scale-[1.02]' 
+                    ? 'bg-slate-800 border-slate-800 text-white shadow-md' 
                     : 'bg-slate-50 border-transparent text-slate-500 hover:bg-slate-100'
                 }`}
               >
-                 <p className="font-bold text-sm mb-1">{workout.label}</p>
-                 <p className={`text-[10px] ${alexWorkoutType === workout.id ? 'text-slate-400' : 'text-slate-400'}`}>{workout.sub}</p>
+                 <p className="font-bold text-sm mb-0.5">{workout.label}</p>
+                 <p className={`text-[9px] ${alexWorkoutType === workout.id ? 'text-slate-400' : 'text-slate-400'}`}>{workout.sub}</p>
               </button>
             ))}
          </div>
       </div>
 
       {/* 2. CONTADOR DE PROTEÍNA */}
-      <div className="bg-indigo-50 rounded-3xl p-6 border border-indigo-100">
-         <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-indigo-900 flex items-center gap-2">
-              <Beef className="w-5 h-5 text-indigo-600" />
+      <div className="bg-indigo-50 rounded-[1.5rem] p-5 border border-indigo-100">
+         <div className="flex justify-between items-center mb-3">
+            <h3 className="font-bold text-indigo-900 flex items-center gap-2 text-sm">
+              <Beef className="w-4 h-4 text-indigo-600" />
               Macros (Proteína)
             </h3>
-            <span className="text-xs font-bold text-indigo-400">Meta: {proteinGoal}g</span>
+            <span className="text-[10px] font-bold text-indigo-400">Meta: {proteinGoal}g</span>
          </div>
 
-         <div className="flex items-end gap-2 mb-4">
-            <span className="text-4xl font-bold text-indigo-900">{proteinIntake}</span>
-            <span className="text-sm font-medium text-indigo-500 mb-1">/ {proteinGoal}g</span>
+         <div className="flex items-end gap-2 mb-3">
+            <span className="text-3xl font-bold text-indigo-900 leading-none">{proteinIntake}</span>
+            <span className="text-xs font-medium text-indigo-500 mb-0.5">/ {proteinGoal}g</span>
          </div>
          
-         <div className="w-full h-3 bg-white rounded-full overflow-hidden mb-6 border border-indigo-100">
+         <div className="w-full h-2 bg-white rounded-full overflow-hidden mb-4 border border-indigo-100">
             <div 
               className={`h-full rounded-full transition-all ${proteinIntake >= proteinGoal ? 'bg-green-500' : 'bg-indigo-500'}`} 
               style={{ width: `${Math.min((proteinIntake/proteinGoal)*100, 100)}%` }}
@@ -331,109 +322,109 @@ const FitnessTracker: React.FC<FitnessTrackerProps> = ({ currentUser }) => {
          </div>
 
          <div className="flex gap-2 justify-between">
-            <button onClick={() => setProteinIntake(Math.max(0, proteinIntake - 10))} className="p-3 bg-white text-indigo-300 rounded-xl hover:bg-indigo-100"><Minus className="w-5 h-5" /></button>
+            <button onClick={() => setProteinIntake(Math.max(0, proteinIntake - 10))} className="w-10 h-10 flex items-center justify-center bg-white text-indigo-300 rounded-xl active:scale-90 transition-transform"><Minus className="w-4 h-4" /></button>
             <div className="flex gap-2">
-               <button onClick={() => setProteinIntake(proteinIntake + 20)} className="px-4 py-2 bg-white text-indigo-700 font-bold rounded-xl shadow-sm border border-indigo-100 hover:bg-indigo-100">+20g (Whey)</button>
-               <button onClick={() => setProteinIntake(proteinIntake + 30)} className="px-4 py-2 bg-white text-indigo-700 font-bold rounded-xl shadow-sm border border-indigo-100 hover:bg-indigo-100">+30g (Ref)</button>
+               <button onClick={() => setProteinIntake(proteinIntake + 20)} className="px-3 py-2 bg-white text-indigo-700 text-xs font-bold rounded-xl shadow-sm border border-indigo-100 active:scale-95 transition-transform">+20g</button>
+               <button onClick={() => setProteinIntake(proteinIntake + 30)} className="px-3 py-2 bg-white text-indigo-700 text-xs font-bold rounded-xl shadow-sm border border-indigo-100 active:scale-95 transition-transform">+30g</button>
             </div>
          </div>
       </div>
 
-      {/* 3. CHECKLIST RÁPIDO (Água e Creatina) */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* 3. CHECKLIST RÁPIDO */}
+      <div className="grid grid-cols-2 gap-3">
          {/* Água */}
-         <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
-            <div className="flex items-center gap-2 text-blue-500 mb-2">
-               <Droplets className="w-5 h-5" />
-               <span className="font-bold text-sm">Água</span>
+         <div className="bg-white p-4 rounded-[1.5rem] border border-slate-100 shadow-sm flex flex-col justify-between">
+            <div className="flex items-center gap-2 text-blue-500 mb-1">
+               <Droplets className="w-4 h-4" />
+               <span className="font-bold text-xs">Água</span>
             </div>
-            <div className="text-center my-2">
-               <span className="text-3xl font-bold text-slate-800">{waterCount}</span>
-               <span className="text-xs text-slate-400"> / 8 copos</span>
+            <div className="text-center my-1">
+               <span className="text-2xl font-bold text-slate-800">{waterCount}</span>
+               <span className="text-[10px] text-slate-400"> / 8 copos</span>
             </div>
             <button 
               onClick={() => setWaterCount(Math.min(8, waterCount + 1))}
-              className="w-full bg-blue-500 text-white py-2 rounded-lg font-bold text-sm hover:bg-blue-600 active:scale-95 transition-transform"
+              className="w-full bg-blue-500 text-white py-1.5 rounded-lg font-bold text-xs active:scale-95 transition-transform"
             >
               +1 Copo
             </button>
          </div>
 
          {/* Creatina */}
-         <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
-            <div className="flex items-center gap-2 text-yellow-500 mb-2">
-               <Flame className="w-5 h-5" />
-               <span className="font-bold text-sm">Creatina</span>
+         <div className="bg-white p-4 rounded-[1.5rem] border border-slate-100 shadow-sm flex flex-col justify-between">
+            <div className="flex items-center gap-2 text-yellow-500 mb-1">
+               <Flame className="w-4 h-4" />
+               <span className="font-bold text-xs">Creatina</span>
             </div>
-            <div className="text-center my-2">
+            <div className="text-center my-1">
                {supplements.find(s => s.id === 'creatina')?.taken ? (
-                 <Check className="w-8 h-8 text-green-500 mx-auto" />
+                 <Check className="w-7 h-7 text-green-500 mx-auto" />
                ) : (
-                 <span className="text-xs text-slate-400 italic">Pendente</span>
+                 <span className="text-[10px] text-slate-400 italic">Pendente</span>
                )}
             </div>
             <button 
               onClick={() => toggleSupplement('creatina')}
-              className={`w-full py-2 rounded-lg font-bold text-sm active:scale-95 transition-transform ${supplements.find(s => s.id === 'creatina')?.taken ? 'bg-green-100 text-green-700' : 'bg-slate-900 text-white'}`}
+              className={`w-full py-1.5 rounded-lg font-bold text-xs active:scale-95 transition-transform ${supplements.find(s => s.id === 'creatina')?.taken ? 'bg-green-100 text-green-700' : 'bg-slate-900 text-white'}`}
             >
               {supplements.find(s => s.id === 'creatina')?.taken ? 'Tomado' : 'Tomar'}
             </button>
          </div>
       </div>
 
-      {/* 4. GALERIA DO SHAPE */}
-      <div className="bg-slate-900 rounded-3xl p-6 text-white shadow-xl">
-        <div className="flex justify-between items-start mb-6">
+      {/* 4. GALERIA SHAPE */}
+      <div className="bg-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl">
+        <div className="flex justify-between items-start mb-4">
           <div>
-            <h3 className="font-bold flex items-center gap-2 text-lg">
+            <h3 className="font-bold flex items-center gap-2 text-sm">
               Galeria do Shape
-              <Lock className="w-4 h-4 text-slate-500" />
+              <Lock className="w-3 h-3 text-slate-500" />
             </h3>
-            <p className="text-slate-400 text-xs mt-1">Fotos privadas de evolução</p>
+            <p className="text-slate-400 text-[10px] mt-0.5">Fotos privadas</p>
           </div>
-          <label className="bg-slate-800 p-2 rounded-lg cursor-pointer hover:bg-slate-700 transition-colors">
-            <Camera className="w-5 h-5 text-emerald-400" />
+          <label className="bg-slate-800 p-2 rounded-lg cursor-pointer active:bg-slate-700 transition-colors">
+            <Camera className="w-4 h-4 text-emerald-400" />
             <input type="file" className="hidden" accept="image/*" onChange={handleUploadShape} />
           </label>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {shapePhotos.map(photo => (
              <div key={photo.id} className="relative aspect-[3/4] rounded-lg overflow-hidden bg-slate-800 border border-slate-700">
-               <img src={photo.url} alt="Shape" className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity" />
+               <img src={photo.url} alt="Shape" className="w-full h-full object-cover opacity-90" />
                <div className="absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black/80 to-transparent">
-                  <p className="text-[10px] text-slate-300">{photo.caption}</p>
+                  <p className="text-[9px] text-slate-300">{photo.caption}</p>
                </div>
             </div>
           ))}
         </div>
       </div>
       
-      {/* 5. LOJA DE RECOMPENSAS (Shared) */}
-      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-slate-900 flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-indigo-500" />
+      {/* 5. LOJA */}
+      <div className="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="font-bold text-slate-900 flex items-center gap-2 text-sm">
+            <ShoppingBag className="w-4 h-4 text-indigo-500" />
             Loja (Love Coins)
           </h3>
-          <span className="text-xs font-bold bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200 flex items-center gap-1">
+          <span className="text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200 flex items-center gap-1">
              <Sparkles className="w-3 h-3" />
              {userPoints}
           </span>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {rewards.map(reward => (
             <button
               key={reward.id}
               disabled={userPoints < reward.cost || reward.redeemed}
               onClick={() => handleRedeem(reward.id, reward.cost)}
-              className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${
-                reward.redeemed ? 'bg-gray-100 opacity-70' : 'bg-white hover:bg-slate-50'
+              className={`w-full flex items-center justify-between p-2.5 rounded-xl border transition-all active:scale-[0.98] ${
+                reward.redeemed ? 'bg-gray-50 opacity-60' : 'bg-white hover:bg-slate-50'
               }`}
             >
               <div className="flex items-center gap-3">
-                <span className="text-xl">{reward.icon}</span>
-                <span className="text-sm font-medium text-slate-700 text-left">{reward.title}</span>
+                <span className="text-lg">{reward.icon}</span>
+                <span className="text-xs font-medium text-slate-700 text-left">{reward.title}</span>
               </div>
               <span className="text-xs font-bold text-amber-500">{reward.cost}</span>
             </button>

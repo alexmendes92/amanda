@@ -11,35 +11,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
       /* Reset básico para sensação de App */
-      html, body {
+      html {
+        height: 100%;
+        height: 100dvh; /* Dynamic Viewport Height para mobile */
+      }
+      
+      body {
         font-family: 'Inter', sans-serif;
         background-color: #f8fafc;
         overscroll-behavior-y: none; /* Previne o 'bounce' da página inteira */
         height: 100%;
+        height: 100dvh;
         width: 100%;
         overflow: hidden; /* O scroll é gerenciado pelo container React */
         -webkit-font-smoothing: antialiased;
+        position: fixed; /* Trava o body para evitar scroll elástico no iOS */
       }
 
-      /* Esconde scrollbar mas mantém funcionalidade (Chrome/Safari/Opera) */
+      /* Esconde scrollbar mas mantém funcionalidade */
       .no-scrollbar::-webkit-scrollbar {
         display: none;
       }
-      
-      /* Esconde scrollbar (IE, Edge and Firefox) */
       .no-scrollbar {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
 
       /* Remove o highlight azul padrão ao tocar em botões no mobile */
       * {
         -webkit-tap-highlight-color: transparent;
-        user-select: none; /* Previne seleção de texto acidental (exceto inputs) */
+        user-select: none;
       }
       
-      input, textarea {
+      /* Inputs com fonte 16px evitam zoom automático no iOS */
+      input, textarea, select {
         user-select: text;
+        font-size: 16px !important; 
       }
 
       /* Safe Area para iPhones com Notch */
@@ -48,6 +55,13 @@
       }
       .pt-safe {
         padding-top: env(safe-area-inset-top);
+      }
+      
+      /* Animações suaves */
+      .smooth-transition {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
       }
     </style>
   <script type="importmap">
@@ -65,7 +79,6 @@
 </head>
   <body>
     <div id="root" class="h-full w-full"></div>
-    
     <script type="module" src="/index.tsx"></script>    
   </body>
 </html>
