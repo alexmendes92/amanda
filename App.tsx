@@ -16,7 +16,7 @@ import Playlist from './components/Playlist';
 import Habits from './components/Habits';
 import Insights from './components/Insights';
 import YouAreRight from './components/YouAreRight';
-import { UserCircle2, ListTodo, Dumbbell, Moon, Pill, CalendarHeart, Music, Image, Tv, BookOpen, BarChart3, ChevronLeft, ArrowRight, Activity, Heart, Sparkles, Crown } from 'lucide-react';
+import { UserCircle2, ListTodo, Dumbbell, Moon, Pill, CalendarHeart, Music, Image, Tv, BookOpen, BarChart3, ChevronLeft, ArrowRight, Activity, Heart, Sparkles, Crown, Sun } from 'lucide-react';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserRole>('amanda');
@@ -78,9 +78,9 @@ const App: React.FC = () => {
   }) => (
     <button 
       onClick={onClick}
-      className={`${bgClass} p-5 rounded-[2rem] border border-transparent text-left transition-all duration-300 active:scale-95 hover:shadow-md group shadow-sm w-full relative overflow-hidden`}
+      className={`${bgClass} p-5 rounded-[2rem] border border-transparent text-left transition-all duration-300 active:scale-95 hover:shadow-md group shadow-sm w-full relative overflow-hidden h-full flex flex-col justify-between`}
     >
-      <div className="relative z-10">
+      <div className="relative z-10 w-full">
         <div className="flex justify-between items-start mb-3">
           <div className={`p-3.5 rounded-2xl bg-white ${colorClass} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
             <Icon className="w-6 h-6" />
@@ -89,8 +89,10 @@ const App: React.FC = () => {
             <ArrowRight className="w-4 h-4" />
           </div>
         </div>
-        <h3 className="font-bold text-slate-800 text-lg leading-tight mb-1 tracking-tight">{title}</h3>
-        <p className="text-xs text-slate-500 font-medium opacity-80">{subtitle}</p>
+        <div>
+          <h3 className="font-bold text-slate-800 text-lg leading-tight mb-1 tracking-tight">{title}</h3>
+          <p className="text-xs text-slate-500 font-medium opacity-80 line-clamp-2">{subtitle}</p>
+        </div>
       </div>
     </button>
   );
@@ -146,63 +148,95 @@ const App: React.FC = () => {
             {activeTab === AppTab.HOME && (
               <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500 delay-100">
                 
-                {/* 1. Destaque */}
-                <Countdown currentUser={currentUser} />
+                {/* 1. HEADER: Mensagem de Boas-vindas (Movido para o Topo) */}
+                <div className={`p-6 rounded-[2.5rem] text-white shadow-xl shadow-slate-200 relative overflow-hidden transition-colors duration-500 ${currentUser === 'amanda' ? 'bg-gradient-to-br from-rose-500 to-pink-600' : 'bg-slate-900'}`}>
+                   {/* Abstract decoration */}
+                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                   <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full -ml-8 -mb-8 blur-xl"></div>
+                   
+                   <div className="relative z-10">
+                     <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <p className="text-white/70 text-xs font-bold uppercase tracking-widest mb-1">
+                            {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                          </p>
+                          <p className="font-bold text-2xl leading-tight">
+                            {currentUser === 'amanda' ? 'Bom dia, Princesa! 👑' : 'Fala, Guerreiro! 🛡️'}
+                          </p>
+                        </div>
+                        <div className="bg-white/20 backdrop-blur-md p-2 rounded-xl">
+                          <Sun className="w-6 h-6 text-white" />
+                        </div>
+                     </div>
+                     
+                     <p className="text-white/90 text-sm font-medium leading-relaxed bg-black/10 p-3 rounded-xl border border-white/5">
+                       {currentUser === 'amanda' 
+                         ? 'Lembre-se: O Alex te ama mais que ontem.' 
+                         : 'Hoje é um ótimo dia para fazer a Amanda sorrir.'}
+                     </p>
+                   </div>
+                </div>
                 
-                {/* 2. Clima e Humor */}
-                <div className="space-y-4">
-                  <WeatherWidget />
-                  <MoodWidget currentUser={currentUser} />
+                {/* 2. HERO: Destaque (Countdown) */}
+                <div>
+                   <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 px-1 flex items-center gap-2">
+                      <Sparkles className="w-3 h-3" />
+                      Destaque
+                   </h3>
+                   <Countdown currentUser={currentUser} />
                 </div>
 
-                {/* 3. MENU PRINCIPAL (Widgets de Navegação) */}
+                {/* 3. NAVEGAÇÃO: Acesso Rápido (Bento Grid) */}
                 <div>
                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 px-1 flex items-center gap-2">
                       <Activity className="w-3 h-3" />
-                      Menu Principal
+                      Acesso Rápido
                    </h3>
-                   <div className="grid grid-cols-1 gap-4">
-                      <MenuWidget 
-                        onClick={() => setActiveTab(AppTab.ROUTINE_MENU)}
-                        icon={Dumbbell}
-                        title="Rotina & Saúde"
-                        subtitle="Hábitos, Treino, Sono & Suplementos"
-                        bgClass="bg-emerald-50"
-                        colorClass="text-emerald-600"
-                      />
-                      <div className="grid grid-cols-2 gap-4">
+                   <div className="grid grid-cols-2 gap-3">
+                      {/* Full Width Item */}
+                      <div className="col-span-2">
                         <MenuWidget 
-                          onClick={() => setActiveTab(AppTab.LOVE_MENU)}
-                          icon={Heart}
-                          title="Nós Dois"
-                          subtitle="Dates & Fotos"
-                          bgClass="bg-rose-50"
-                          colorClass="text-rose-500"
-                        />
-                        <MenuWidget 
-                          onClick={() => setActiveTab(AppTab.LEISURE_MENU)}
-                          icon={Sparkles}
-                          title="Lazer"
-                          subtitle="Séries & Fé"
-                          bgClass="bg-amber-50"
-                          colorClass="text-amber-600"
+                          onClick={() => setActiveTab(AppTab.ROUTINE_MENU)}
+                          icon={Dumbbell}
+                          title="Rotina & Saúde"
+                          subtitle="Hábitos, Treino, Sono & Suplementos"
+                          bgClass="bg-emerald-50"
+                          colorClass="text-emerald-600"
                         />
                       </div>
+                      
+                      {/* Split Items */}
+                      <MenuWidget 
+                        onClick={() => setActiveTab(AppTab.LOVE_MENU)}
+                        icon={Heart}
+                        title="Nós Dois"
+                        subtitle="Dates & Fotos"
+                        bgClass="bg-rose-50"
+                        colorClass="text-rose-500"
+                      />
+                      <MenuWidget 
+                        onClick={() => setActiveTab(AppTab.LEISURE_MENU)}
+                        icon={Tv}
+                        title="Lazer"
+                        subtitle="Séries & Fé"
+                        bgClass="bg-amber-50"
+                        colorClass="text-amber-600"
+                      />
                    </div>
                 </div>
 
-                {/* Mensagem de Bom dia */}
-                <div className={`p-6 rounded-[2rem] text-white shadow-xl shadow-slate-200 relative overflow-hidden transition-colors duration-500 ${currentUser === 'amanda' ? 'bg-gradient-to-br from-rose-500 to-pink-600' : 'bg-slate-900'}`}>
-                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
-                   <p className="font-bold text-lg mb-1 relative z-10">
-                     {currentUser === 'amanda' ? 'Bom dia, Princesa! 👑' : 'Fala, Guerreiro! 🛡️'}
-                   </p>
-                   <p className="text-white/80 text-sm relative z-10">
-                     {currentUser === 'amanda' 
-                       ? 'Lembre-se: O Alex te ama mais que ontem.' 
-                       : 'Hoje é um ótimo dia para fazer a Amanda sorrir.'}
-                   </p>
+                {/* 4. INFORMAÇÕES: Status do Dia (Movido para o fim) */}
+                <div>
+                   <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 px-1 flex items-center gap-2">
+                      <BarChart3 className="w-3 h-3" />
+                      Status do Dia
+                   </h3>
+                   <div className="space-y-4">
+                      <WeatherWidget />
+                      <MoodWidget currentUser={currentUser} />
+                   </div>
                 </div>
+
               </div>
             )}
 
