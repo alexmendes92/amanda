@@ -128,3 +128,41 @@ export const getPlaylistSuggestion = async (vibe: string): Promise<any[]> => {
     ];
   }
 };
+
+export const getExploreSuggestions = async (location: string): Promise<any[]> => {
+  try {
+    const model = 'gemini-3-flash-preview';
+    const prompt = `
+      O usuário quer sugestões de lugares românticos ou divertidos para um casal visitar em: ${location}.
+      Sugira 4 lugares específicos.
+      
+      Para cada lugar, você DEVE estimar a latitude e longitude (lat, lng) aproximadas.
+      
+      Retorne APENAS um JSON array neste formato:
+      [
+        { 
+          "name": "Nome do Lugar", 
+          "description": "Breve descrição (max 10 palavras)", 
+          "lat": -23.1234, 
+          "lng": -46.1234,
+          "type": "food" | "nature" | "fun"
+        }
+      ]
+    `;
+
+    const response = await ai.models.generateContent({
+      model: model,
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+      }
+    });
+
+    const text = response.text;
+    if (!text) return [];
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Explore Error:", error);
+    return [];
+  }
+};
