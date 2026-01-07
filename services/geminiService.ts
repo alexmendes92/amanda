@@ -144,9 +144,10 @@ export const getMotivationQuote = async (type: 'classic' | 'funk'): Promise<{ qu
       `;
     } else { // funk
       prompt = `
-        Gere uma frase curta, motivacional e de auto-estima a partir da letra de um funkeiro brasileiro (Ex: MC Ryan SP, MC Hariel, Kayblack, Vulgo FK).
-        A frase deve ser sobre superação, sucesso, fé ou valor próprio.
-        NÃO use palavras de baixo calão. Mantenha o tom de "visão de cria".
+        Gere uma frase curta, engraçada e com um toque de 'putaria leve' ou flerte, no estilo de uma letra de funk brasileiro (Ex: MC Ryan SP, MC Hariel, Kayblack, Vulgo FK, MC Cabelinho).
+        O tom deve ser de uma "cantada de baile funk", algo que um funkeiro diria para a namorada.
+        Deve ser engraçado e ousado, mas SEM usar palavras de baixo calão ou ser desrespeitoso.
+        Foco: humor, flerte, um pouco de 'putaria' na brincadeira.
         Retorne em JSON: { "quote": "...", "author": "..." }
       `;
     }
@@ -171,8 +172,8 @@ export const getMotivationQuote = async (type: 'classic' | 'funk'): Promise<{ qu
       };
     } else {
       return {
-        quote: "O impossível é só questão de opinião.",
-        author: "MC Hariel"
+        quote: "Se o plano A não funciona, o alfabeto tem mais 25 letras. E a 'P' é de putaria.",
+        author: "Poeta Desconhecido"
       };
     }
   }
